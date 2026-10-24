@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { seedDatabaseIfEmpty } from './db';
 import { PosPage } from './pages/PosPage';
+import { ConfirmModal } from './components/common/ConfirmModal';
 
 export const App: React.FC = () => {
   useEffect(() => {
@@ -9,7 +10,12 @@ export const App: React.FC = () => {
     });
   }, []);
 
-  return <PosPage />;
+  return (
+    <>
+      <PosPage />
+      <ConfirmModal />
+    </>
+  );
 };
 
 export default App;

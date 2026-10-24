@@ -4,6 +4,7 @@ import { shiftRepository } from '../../db';
 import type { CashierShift } from '../../types/database';
 import { receiptService } from '../../services/receiptService';
 import { Button } from '../common/Button';
+import { useConfirmStore } from '../../store/confirmStore';
 import './ShiftModal.css';
 
 interface ShiftModalProps {
@@ -66,18 +67,25 @@ export const ShiftModal: React.FC<ShiftModalProps> = ({
   const handleCloseShift = async () => {
     if (!activeShift) return;
 
-    if (!confirm('Apakah Anda yakin ingin menutup shift kasir saat ini?')) return;
-
-    try {
-      setIsSubmitting(true);
-      await shiftRepository.closeShift(activeShift.id, actualCash);
-      onShiftUpdated();
-      onClose();
-    } catch (err: any) {
-      alert(err.message || 'Gagal menutup shift');
-    } finally {
-      setIsSubmitting(false);
-    }
+    useConfirmStore.getState().showConfirm({
+      title: 'Tutup Shift Kasir?',
+      message: 'Apakah Anda yakin ingin menutup sesi shift kasir saat ini dan mengunci rekap uang fisik?',
+      confirmText: 'Ya, Tutup Shift',
+      cancelText: 'Batal',
+      variant: 'warning',
+      onConfirm: async () => {
+        try {
+          setIsSubmitting(true);
+          await shiftRepository.closeShift(activeShift.id, actualCash);
+          onShiftUpdated();
+          onClose();
+        } catch (err: any) {
+          alert(err.message || 'Gagal menutup shift');
+        } finally {
+          setIsSubmitting(false);
+        }
+      }
+    });
   };
 
   return (

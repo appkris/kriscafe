@@ -10,6 +10,7 @@ import {
   X
 } from 'lucide-react';
 import { useCartStore } from '../../store/cartStore';
+import { useConfirmStore } from '../../store/confirmStore';
 import { Button } from '../common/Button';
 import './CartSidebar.css';
 
@@ -21,19 +22,17 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ onProceedToCheckout })
   const {
     items,
     orderType,
-    tableNumber,
-    customerName,
     isMobileCartOpen,
     removeItem,
     updateQuantity,
     setOrderType,
-    setTableNumber,
-    setCustomerName,
     setIsMobileCartOpen,
     clearCart,
     getSubtotal,
     getTotalItems
   } = useCartStore();
+
+  const showConfirm = useConfirmStore((s) => s.showConfirm);
 
   const subtotal = getSubtotal();
   const totalItems = getTotalItems();
@@ -48,9 +47,16 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ onProceedToCheckout })
 
   const handleClearCart = () => {
     if (items.length === 0) return;
-    if (confirm('Kosongkan seluruh keranjang pesanan?')) {
-      clearCart();
-    }
+    showConfirm({
+      title: 'Kosongkan Pesanan?',
+      message: 'Apakah Anda yakin ingin menghapus seluruh item pesanan di keranjang kasir?',
+      confirmText: 'Ya, Kosongkan',
+      cancelText: 'Batal',
+      variant: 'danger',
+      onConfirm: () => {
+        clearCart();
+      }
+    });
   };
 
   return (
@@ -122,27 +128,6 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ onProceedToCheckout })
               <span>Takeaway</span>
             </button>
           </div>
-
-          {/* Table Number or Customer Name Input */}
-          <div className="order-meta-row">
-            {orderType === 'DINE_IN' ? (
-              <input
-                type="text"
-                className="order-meta-input"
-                placeholder="No. Meja (misal: 05)"
-                value={tableNumber}
-                onChange={(e) => setTableNumber(e.target.value)}
-              />
-            ) : (
-              <input
-                type="text"
-                className="order-meta-input"
-                placeholder="Nama Pemesan (opsional)"
-                value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
-              />
-            )}
-          </div>
         </div>
 
         {/* Cart Items List */}
@@ -173,92 +158,63 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ onProceedToCheckout })
                     type="button"
                     style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '2px' }}
                     onClick={() => removeItem(item.id)}
-                    title="Hapus item"
+                    title="Hapus menu ini"
                   >
-                    <Trash2 size={14} />
+                    <X size={14} />
                   </button>
                 </div>
 
-                <div className="cart-item-controls">
-                  <div className="qty-counter">
+                <div className="cart-item-pricing">
+                  <span className="cart-item-subtotal">
+                    {formatRupiah(item.price * item.quantity)}
+                  </span>
+
+                  {/* Quantity Stepper */}
+                  <div className="qty-stepper">
                     <button
                       type="button"
                       className="qty-btn"
                       onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      title="Kurangi"
                     >
-                      <Minus size={13} />
+                      <Minus size={12} />
                     </button>
-                    <span className="qty-number">{item.quantity}</span>
+                    <span className="qty-val">{item.quantity}</span>
                     <button
                       type="button"
                       className="qty-btn"
                       onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      title="Tambah"
-                      disabled={!item.isUnlimitedStock && item.quantity >= item.stock}
                     >
-                      <Plus size={13} />
+                      <Plus size={12} />
                     </button>
                   </div>
-
-                  <span className="cart-item-subtotal">
-                    {formatRupiah(item.price * item.quantity)}
-                  </span>
                 </div>
               </div>
             ))
           )}
         </div>
 
-        {/* Footer & Checkout Action */}
+        {/* Cart Footer / Checkout Trigger */}
         <div className="cart-footer">
-          <div className="summary-line">
-            <span>Subtotal ({totalItems} item)</span>
-            <span className="font-mono">{formatRupiah(subtotal)}</span>
+          <div className="cart-summary-line">
+            <span>Subtotal</span>
+            <span style={{ fontFamily: 'var(--font-mono)' }}>{formatRupiah(subtotal)}</span>
           </div>
-          <div className="summary-line">
-            <span>Diskon / Pajak</span>
-            <span className="font-mono">Rp 0</span>
-          </div>
-          <div className="summary-line summary-line--total">
-            <span>TOTAL</span>
-            <span className="total-amount">{formatRupiah(subtotal)}</span>
+          <div className="cart-summary-line cart-summary-line--total">
+            <span>Total Tagihan</span>
+            <span style={{ color: 'var(--accent-hover)' }}>{formatRupiah(subtotal)}</span>
           </div>
 
           <Button
             variant="primary"
             size="lg"
-            fullWidth
-            icon={<ArrowRight size={20} />}
             disabled={items.length === 0}
             onClick={onProceedToCheckout}
+            icon={<ArrowRight size={18} />}
           >
-            Lanjut Bayar • {formatRupiah(subtotal)}
+            Bayar ({totalItems} item)
           </Button>
         </div>
       </aside>
-
-      {/* Floating Trigger Bar on Mobile */}
-      {items.length > 0 && !isMobileCartOpen && (
-        <div className="mobile-cart-trigger">
-          <div>
-            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
-              {totalItems} item ({orderType})
-            </div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 'var(--weight-bold)', color: 'var(--accent-hover)', fontSize: 'var(--text-lg)' }}>
-              {formatRupiah(subtotal)}
-            </div>
-          </div>
-          <Button
-            variant="primary"
-            size="md"
-            icon={<ShoppingBag size={18} />}
-            onClick={() => setIsMobileCartOpen(true)}
-          >
-            Lihat Pesanan
-          </Button>
-        </div>
-      )}
     </>
   );
 };

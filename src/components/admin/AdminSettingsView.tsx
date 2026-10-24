@@ -14,6 +14,7 @@ import {
 import { db } from '../../db';
 import { resetDatabaseToDefaults } from '../../db/seed';
 import { useAuthStore } from '../../store/authStore';
+import { useConfirmStore } from '../../store/confirmStore';
 import './AdminSettingsView.css';
 
 export const AdminSettingsView: React.FC = () => {
@@ -103,16 +104,20 @@ export const AdminSettingsView: React.FC = () => {
   };
 
   const handleResetData = async () => {
-    const confirmReset = window.confirm(
-      'Apakah Anda yakin ingin me-reset data menu dan kategori ke data demo bawaan KrisCafe? Data transaksi tetap aman.'
-    );
-    if (!confirmReset) return;
-
-    setIsResetting(true);
-    await resetDatabaseToDefaults();
-    setIsResetting(false);
-    setResetSuccessMsg('✅ Data demo menu & kategori berhasil dipulihkan!');
-    setTimeout(() => setResetSuccessMsg(null), 3000);
+    useConfirmStore.getState().showConfirm({
+      title: 'Reset Menu ke Data Demo?',
+      message: 'Apakah Anda yakin ingin memulihkan menu dan kategori bawaan KrisCafe? Data transaksi penjualan tetap aman.',
+      confirmText: 'Ya, Pulihkan',
+      cancelText: 'Batal',
+      variant: 'warning',
+      onConfirm: async () => {
+        setIsResetting(true);
+        await resetDatabaseToDefaults();
+        setIsResetting(false);
+        setResetSuccessMsg('✅ Data demo menu & kategori berhasil dipulihkan!');
+        setTimeout(() => setResetSuccessMsg(null), 3000);
+      }
+    });
   };
 
   return (

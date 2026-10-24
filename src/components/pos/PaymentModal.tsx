@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Coins, 
   QrCode, 
@@ -25,8 +25,6 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
   const { 
     items, 
     orderType, 
-    tableNumber, 
-    customerName, 
     getSubtotal, 
     clearCart 
   } = useCartStore();
@@ -37,6 +35,10 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
   const [cashGiven, setCashGiven] = useState<number>(total);
   const [cashInputText, setCashInputText] = useState<string>(String(total));
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+
+  // Input Opsional No Meja & Nama Pemesan
+  const [tableNumberInput, setTableNumberInput] = useState<string>('');
+  const [customerNameInput, setCustomerNameInput] = useState<string>('');
   
   // Step 2: Transaksi Berhasil & Data Struk
   const [completedData, setCompletedData] = useState<{
@@ -45,8 +47,11 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
   } | null>(null);
 
   const [whatsappPhone, setWhatsappPhone] = useState<string>('');
+  
+  // Ref untuk mengunci eksekusi pembayaran agar tidak terjadi double submit / double invoice
+  const isSubmittingRef = useRef<boolean>(false);
 
-  // Sinkronkan nominal uang saat modal pertama dibuka
+  // Inisialisasi hanya saat modal pertama dibuka
   useEffect(() => {
     if (isOpen) {
       setCashGiven(total);
@@ -54,8 +59,13 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
       setCompletedData(null);
       setPaymentMethod('CASH');
       setWhatsappPhone('');
+      setTableNumberInput('');
+      setCustomerNameInput('');
+      setIsProcessing(false);
+      isSubmittingRef.current = false;
     }
-  }, [isOpen, total]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -75,10 +85,15 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
   };
 
   const handleConfirmPayment = async () => {
+    // Kunci untuk mencegah double submission
+    if (isSubmittingRef.current || isProcessing) return;
+    if (!items || items.length === 0) return;
     if (paymentMethod === 'CASH' && !isCashSufficient) return;
 
     try {
+      isSubmittingRef.current = true;
       setIsProcessing(true);
+
       const amountPaid = paymentMethod === 'CASH' ? cashGiven : total;
       const change = paymentMethod === 'CASH' ? changeDue : 0;
 
@@ -90,28 +105,29 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
         notes: i.notes
       }));
 
-      // Simpan atomik ke IndexedDB & kurangi stok
+      // Simpan atomik ke IndexedDB & potong stok
       const result = await transactionRepository.create({
         subtotal: total,
         total: total,
         paymentMethod: paymentMethod,
         amountPaid: amountPaid,
         changeDue: change,
-        customerName: customerName,
-        tableNumber: tableNumber,
+        customerName: customerNameInput.trim() || undefined,
+        tableNumber: tableNumberInput.trim() || undefined,
         orderType: orderType,
         cashierName: 'Kasir Utama',
         items: checkoutItems
       });
 
       setCompletedData(result);
-      // Kosongkan keranjang belanja
+      // Kosongkan keranjang belanja kasir
       clearCart();
     } catch (err) {
       console.error('Error saat menyelesaikan pembayaran:', err);
       alert('Gagal memproses transaksi.');
     } finally {
       setIsProcessing(false);
+      isSubmittingRef.current = false;
     }
   };
 
@@ -135,7 +151,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
   };
 
   return (
-    <div className="payment-modal-overlay" onClick={onClose}>
+    <div className="payment-modal-overlay" onClick={completedData ? handleFinishAndReset : onClose}>
       <div className="payment-modal-card" onClick={(e) => e.stopPropagation()}>
         {/* Header Modal */}
         <div className="payment-modal-header">
@@ -168,9 +184,39 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
                 </div>
               </div>
 
+              {/* No. Meja & Nama Pemesan Opsional */}
+              <div className="payment-meta-row">
+                <div className="payment-meta-col">
+                  <label className="payment-label" htmlFor="inputTableNumber">
+                    NO. MEJA (OPSIONAL)
+                  </label>
+                  <input
+                    id="inputTableNumber"
+                    type="text"
+                    className="payment-text-input"
+                    placeholder={orderType === 'DINE_IN' ? 'Contoh: Meja 05' : 'Takeaway'}
+                    value={tableNumberInput}
+                    onChange={(e) => setTableNumberInput(e.target.value)}
+                  />
+                </div>
+                <div className="payment-meta-col">
+                  <label className="payment-label" htmlFor="inputCustomerName">
+                    NAMA PEMESAN (OPSIONAL)
+                  </label>
+                  <input
+                    id="inputCustomerName"
+                    type="text"
+                    className="payment-text-input"
+                    placeholder="Nama pelanggan"
+                    value={customerNameInput}
+                    onChange={(e) => setCustomerNameInput(e.target.value)}
+                  />
+                </div>
+              </div>
+
               {/* Pilihan Metode: Tunai vs QRIS */}
               <div>
-                <label style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', display: 'block', marginBottom: 'var(--space-2)' }}>
+                <label className="payment-label" style={{ display: 'block', marginBottom: 'var(--space-2)' }}>
                   METODE PEMBAYARAN
                 </label>
                 <div className="method-tabs">
@@ -197,7 +243,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
               {paymentMethod === 'CASH' ? (
                 <>
                   <div>
-                    <label style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', display: 'block', marginBottom: 'var(--space-2)' }}>
+                    <label className="payment-label" style={{ display: 'block', marginBottom: 'var(--space-2)' }}>
                       NOMINAL CEPAT (QUICK CASH)
                     </label>
                     <div className="quick-cash-grid">
@@ -240,7 +286,6 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
                         type="button"
                         className="quick-cash-btn"
                         onClick={() => {
-                          // Bulatkan ke atas terdekat kelipatan 10.000
                           const rounded = Math.ceil(total / 10000) * 10000;
                           handleSelectQuickCash(rounded);
                         }}
@@ -251,7 +296,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
                   </div>
 
                   <div>
-                    <label style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', display: 'block', marginBottom: 'var(--space-2)' }}>
+                    <label className="payment-label" style={{ display: 'block', marginBottom: 'var(--space-2)' }}>
                       UANG DITERIMA DARI PEMBELI (RP)
                     </label>
                     <div className="cash-input-row">
@@ -329,6 +374,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
               <Button
                 variant="primary"
                 size="lg"
+                id="btn-confirm-payment"
                 icon={<CheckCircle2 size={18} />}
                 disabled={(paymentMethod === 'CASH' && !isCashSufficient) || isProcessing}
                 onClick={handleConfirmPayment}
@@ -359,64 +405,53 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
                 </span>
               </div>
 
-              {/* Action Struk */}
+              {/* Tombol Cetak Struk Fisik & Digital WhatsApp */}
               <div className="receipt-step-actions">
                 <Button
                   variant="primary"
                   size="md"
-                  fullWidth
                   icon={<Printer size={18} />}
                   onClick={handlePrintReceipt}
                 >
                   Cetak Struk Thermal (58mm)
                 </Button>
 
-                {/* Input WhatsApp Struk */}
-                <div style={{ marginTop: 'var(--space-2)' }}>
-                  <label style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', display: 'block', marginBottom: 'var(--space-1)' }}>
-                    KIRIM STRUK DIGITAL VIA WHATSAPP (OPSIONAL)
-                  </label>
-                  <div className="whatsapp-input-group">
-                    <input
-                      type="text"
-                      className="whatsapp-input"
-                      placeholder="Contoh: 081234567890"
-                      value={whatsappPhone}
-                      onChange={(e) => setWhatsappPhone(e.target.value)}
-                    />
-                    <Button
-                      variant="secondary"
-                      size="md"
-                      icon={<Send size={16} />}
-                      onClick={handleSendWhatsApp}
-                      style={{ color: '#25D366', borderColor: 'rgba(37, 211, 102, 0.3)' }}
-                    >
-                      Kirim WA
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Struk Preview */}
-                <div style={{ marginTop: 'var(--space-2)' }}>
-                  <ThermalReceipt58
-                    transaction={completedData.transaction}
-                    items={completedData.items}
+                <div className="whatsapp-input-group">
+                  <input
+                    type="tel"
+                    className="whatsapp-input"
+                    placeholder="Nomor WA (contoh: 08123456789)"
+                    value={whatsappPhone}
+                    onChange={(e) => setWhatsappPhone(e.target.value)}
                   />
+                  <Button
+                    variant="secondary"
+                    size="md"
+                    icon={<Send size={16} />}
+                    onClick={handleSendWhatsApp}
+                  >
+                    Kirim WA
+                  </Button>
                 </div>
               </div>
             </div>
 
             <div className="payment-modal-footer">
               <Button
-                variant="primary"
+                variant="outline"
                 size="lg"
-                fullWidth
-                icon={<RotateCcw size={18} />}
+                icon={<RotateCcw size={16} />}
                 onClick={handleFinishAndReset}
               >
-                Transaksi Baru (Selesai)
+                Transaksi Baru
               </Button>
             </div>
+
+            {/* Template Struk Thermal 58mm (Tersembunyi di Layar, Aktif saat Print) */}
+            <ThermalReceipt58
+              transaction={completedData.transaction}
+              items={completedData.items}
+            />
           </>
         )}
       </div>

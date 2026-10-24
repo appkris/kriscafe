@@ -7,28 +7,29 @@
 
 .pos-search-icon {
   position: absolute;
-  left: var(--space-4);
+  left: 12px;
   color: var(--text-muted);
   pointer-events: none;
+  z-index: 2;
 }
 
 .pos-search-input {
   width: 100%;
-  min-height: 46px;
-  padding: 0 var(--space-10) 0 44px;
-  background-color: var(--bg-surface);
+  min-height: 42px;
+  padding: 8px 36px 8px 38px !important;
+  background-color: var(--bg-surface-elevated);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   color: var(--text-primary);
   font-family: var(--font-sans);
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
   outline: none;
   transition: border-color var(--transition-fast), background-color var(--transition-fast);
 }
 
 .pos-search-input:focus {
   border-color: var(--accent-primary);
-  background-color: var(--bg-surface-elevated);
+  background-color: var(--bg-surface-hover);
 }
 
 .pos-search-input::placeholder {
@@ -37,20 +38,22 @@
 
 .pos-search-clear-btn {
   position: absolute;
-  right: var(--space-3);
+  right: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  background: var(--bg-surface-elevated);
-  border: none;
+  width: 24px;
+  height: 24px;
+  background: var(--bg-surface-hover);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-full);
-  color: var(--text-muted);
+  color: var(--text-secondary);
   cursor: pointer;
-  transition: color var(--transition-fast);
+  transition: all var(--transition-fast);
+  z-index: 2;
 }
 
 .pos-search-clear-btn:hover {
   color: var(--text-primary);
+  border-color: var(--border-strong);
 }

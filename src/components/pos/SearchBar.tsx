@@ -15,7 +15,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 }) => {
   return (
     <div className="pos-search-wrapper">
-      <Search size={18} className="pos-search-icon" />
+      <Search size={16} className="pos-search-icon" />
       <input
         type="text"
         className="pos-search-input"
