@@ -1,5 +1,5 @@
-import React from 'react';
-import { Plus, MessageSquarePlus } from 'lucide-react';
+import React, { useState } from 'react';
+import { Plus, MessageSquarePlus, Utensils, Coffee } from 'lucide-react';
 import type { MenuItem } from '../../types/database';
 import { Badge } from '../common/Badge';
 import './MenuCard.css';
@@ -17,6 +17,7 @@ export const MenuCard: React.FC<MenuCardProps> = ({
   onAddToCart,
   onOpenNotesModal
 }) => {
+  const [imgError, setImgError] = useState<boolean>(false);
   const isOutOfStock = !menu.is_unlimited_stock && menu.stock <= 0;
 
   const formatRupiah = (val: number) => {
@@ -38,6 +39,8 @@ export const MenuCard: React.FC<MenuCardProps> = ({
     onOpenNotesModal(menu);
   };
 
+  const isCoffee = menu.category_id.includes('coffee') || menu.category_id.includes('kopi');
+
   return (
     <div
       className={`menu-card ${isOutOfStock ? 'menu-card--disabled' : ''} ${inCartQuantity > 0 ? 'menu-card--in-cart' : ''}`}
@@ -45,60 +48,69 @@ export const MenuCard: React.FC<MenuCardProps> = ({
       role="button"
       tabIndex={isOutOfStock ? -1 : 0}
     >
-      {/* Badge jumlah di keranjang */}
-      {inCartQuantity > 0 && (
-        <div className="menu-card__cart-badge">{inCartQuantity}x</div>
-      )}
+      {/* Gambar Foto Menu / Visual Thumbnail */}
+      <div className="menu-card__image-wrapper">
+        {menu.image_url && !imgError ? (
+          <img
+            src={menu.image_url}
+            alt={menu.name}
+            className="menu-card__image"
+            onError={() => setImgError(true)}
+            loading="lazy"
+          />
+        ) : (
+          <div className="menu-card__image-placeholder">
+            {isCoffee ? <Coffee size={28} /> : <Utensils size={28} />}
+          </div>
+        )}
 
-      <div>
-        <div className="menu-card__top">
-          <span className="menu-card__name">{menu.name}</span>
+        {/* Badge Jumlah di Keranjang (Top Left) */}
+        {inCartQuantity > 0 && (
+          <div className="menu-card__cart-badge">{inCartQuantity}x</div>
+        )}
+
+        {/* Badge Status Stok (Top Right) */}
+        <div className="menu-card__stock-badge">
           {isOutOfStock ? (
             <Badge variant="danger">HABIS</Badge>
-          ) : menu.is_unlimited_stock ? (
-            <Badge variant="default">Unlimited</Badge>
-          ) : (
-            <Badge variant={menu.stock <= 5 ? 'warning' : 'success'}>
-              Sisa {menu.stock}
-            </Badge>
-          )}
+          ) : !menu.is_unlimited_stock && menu.stock <= 5 ? (
+            <Badge variant="warning">Sisa {menu.stock}</Badge>
+          ) : null}
         </div>
-
-        {menu.description && (
-          <p className="menu-card__desc">{menu.description}</p>
-        )}
       </div>
 
-      <div className="menu-card__bottom">
-        <span className="menu-card__price">{formatRupiah(menu.price)}</span>
+      {/* Konten Menu Ringkas: Nama & Harga */}
+      <div className="menu-card__body">
+        <h3 className="menu-card__name" title={menu.name}>{menu.name}</h3>
 
-        <div className="menu-card__actions">
-          {/* Tombol Catatan Tambahan */}
-          {!isOutOfStock && (
+        <div className="menu-card__bottom">
+          <span className="menu-card__price">{formatRupiah(menu.price)}</span>
+
+          <div className="menu-card__actions">
+            {!isOutOfStock && (
+              <button
+                type="button"
+                className="menu-card__action-btn"
+                onClick={handleNotesClick}
+                title="Tambah catatan khusus"
+              >
+                <MessageSquarePlus size={15} />
+              </button>
+            )}
+
             <button
               type="button"
-              className="menu-card__note-btn"
-              onClick={handleNotesClick}
-              title="Tambah varian atau catatan"
+              className="menu-card__action-btn menu-card__action-btn--add"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleCardClick();
+              }}
+              title="Tambah ke pesanan"
+              disabled={isOutOfStock}
             >
-              <MessageSquarePlus size={16} />
+              <Plus size={16} strokeWidth={2.5} />
             </button>
-          )}
-
-          {/* Tombol Tambah Cepat */}
-          <button
-            type="button"
-            className="menu-card__note-btn"
-            style={{ backgroundColor: 'var(--accent-subtle)', color: 'var(--accent-hover)', borderColor: 'var(--accent-border)' }}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleCardClick();
-            }}
-            title="Tambah ke keranjang"
-            disabled={isOutOfStock}
-          >
-            <Plus size={16} />
-          </button>
+          </div>
         </div>
       </div>
     </div>

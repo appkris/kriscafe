@@ -14,8 +14,8 @@ export const INITIAL_MENUS: MenuItem[] = [
     id: 'menu-kopi-1',
     category_id: 'cat-coffee',
     name: 'Kopi Susu Gula Aren',
-    description: 'Espresso robusta aromatik dipadu susu segar dan sirup gula aren murni.',
     price: 18000,
+    image_url: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=400&auto=format&fit=crop&q=80',
     is_unlimited_stock: false,
     stock: 35,
     is_active: true,
@@ -26,8 +26,8 @@ export const INITIAL_MENUS: MenuItem[] = [
     id: 'menu-kopi-2',
     category_id: 'cat-coffee',
     name: 'Americano Dingin / Panas',
-    description: 'Espresso ganda dengan air mineral jernih, rasa bersih dan segar.',
     price: 15000,
+    image_url: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400&auto=format&fit=crop&q=80',
     is_unlimited_stock: true,
     stock: 999,
     is_active: true,
@@ -38,8 +38,8 @@ export const INITIAL_MENUS: MenuItem[] = [
     id: 'menu-kopi-3',
     category_id: 'cat-coffee',
     name: 'Kopi Tubruk Nusantara',
-    description: 'Kopi hitam seduh tradisional khas Nusantara yang pekat dan harum.',
     price: 10000,
+    image_url: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&auto=format&fit=crop&q=80',
     is_unlimited_stock: true,
     stock: 999,
     is_active: true,
@@ -50,8 +50,8 @@ export const INITIAL_MENUS: MenuItem[] = [
     id: 'menu-kopi-4',
     category_id: 'cat-coffee',
     name: 'Caramel Macchiato',
-    description: 'Paduan susu creamy, vanilla syrup, espresso, dan drizzle saus karamel lezat.',
     price: 22000,
+    image_url: 'https://images.unsplash.com/photo-1485808191679-5f86510681a2?w=400&auto=format&fit=crop&q=80',
     is_unlimited_stock: false,
     stock: 18,
     is_active: true,
@@ -64,8 +64,8 @@ export const INITIAL_MENUS: MenuItem[] = [
     id: 'menu-non-1',
     category_id: 'cat-non-coffee',
     name: 'Matcha Latte Ice',
-    description: 'Bubuk teh hijau Jepang premium berpadu lembut dengan susu segar dingin.',
     price: 20000,
+    image_url: 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=400&auto=format&fit=crop&q=80',
     is_unlimited_stock: false,
     stock: 20,
     is_active: true,
@@ -76,8 +76,8 @@ export const INITIAL_MENUS: MenuItem[] = [
     id: 'menu-non-2',
     category_id: 'cat-non-coffee',
     name: 'Es Teh Manis Segar',
-    description: 'Teh melati wangi khas diseduh segar dengan rasa manis pas pelepas dahaga.',
     price: 6000,
+    image_url: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&auto=format&fit=crop&q=80',
     is_unlimited_stock: true,
     stock: 999,
     is_active: true,
@@ -88,8 +88,8 @@ export const INITIAL_MENUS: MenuItem[] = [
     id: 'menu-non-3',
     category_id: 'cat-non-coffee',
     name: 'Lemon Tea Dingin',
-    description: 'Perasan jeruk lemon segar berpadu dengan es teh manis menyegarkan.',
     price: 12000,
+    image_url: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400&auto=format&fit=crop&q=80',
     is_unlimited_stock: true,
     stock: 999,
     is_active: true,
@@ -100,8 +100,8 @@ export const INITIAL_MENUS: MenuItem[] = [
     id: 'menu-non-4',
     category_id: 'cat-non-coffee',
     name: 'Chocolate Lava Milk',
-    description: 'Cokelat Belgia pekat dengan susu cair dingin kental nan nikmat.',
     price: 18000,
+    image_url: 'https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?w=400&auto=format&fit=crop&q=80',
     is_unlimited_stock: false,
     stock: 15,
     is_active: true,
@@ -114,8 +114,8 @@ export const INITIAL_MENUS: MenuItem[] = [
     id: 'menu-food-1',
     category_id: 'cat-food',
     name: 'Nasi Goreng Kris Spesial',
-    description: 'Nasi goreng bumbu gurih dengan suwiran ayam, telur mata sapi, dan kerupuk.',
     price: 25000,
+    image_url: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400&auto=format&fit=crop&q=80',
     is_unlimited_stock: false,
     stock: 25,
     is_active: true,
@@ -126,8 +126,8 @@ export const INITIAL_MENUS: MenuItem[] = [
     id: 'menu-food-2',
     category_id: 'cat-food',
     name: 'Mie Goreng Tek-Tek',
-    description: 'Mie telur tumis sayuran segar, telur orak-arik, dan bumbu racikan khas.',
     price: 18000,
+    image_url: 'https://images.unsplash.com/photo-1612927601601-6638404737ce?w=400&auto=format&fit=crop&q=80',
     is_unlimited_stock: false,
     stock: 20,
     is_active: true,
@@ -138,8 +138,8 @@ export const INITIAL_MENUS: MenuItem[] = [
     id: 'menu-food-3',
     category_id: 'cat-food',
     name: 'Rice Bowl Ayam Sambal Matah',
-    description: 'Nasi hangat dengan fillet ayam renyah dan lumuran sambal matah Bali segar.',
     price: 28000,
+    image_url: 'https://images.unsplash.com/photo-1625398407796-82650a8c135f?w=400&auto=format&fit=crop&q=80',
     is_unlimited_stock: false,
     stock: 15,
     is_active: true,
@@ -150,8 +150,8 @@ export const INITIAL_MENUS: MenuItem[] = [
     id: 'menu-food-4',
     category_id: 'cat-food',
     name: 'Nasi Ayam Geprek Krispy',
-    description: 'Ayam goreng tepung garing digeprek bersama cabai rawit pedas mantap.',
     price: 24000,
+    image_url: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=400&auto=format&fit=crop&q=80',
     is_unlimited_stock: false,
     stock: 20,
     is_active: true,
@@ -164,8 +164,8 @@ export const INITIAL_MENUS: MenuItem[] = [
     id: 'menu-snack-1',
     category_id: 'cat-snack',
     name: 'Roti Bakar Cokelat Keju',
-    description: 'Roti tebal bakar mentega isi meses cokelat legit dan parutan keju cheddar melimpah.',
     price: 16000,
+    image_url: 'https://images.unsplash.com/photo-1584776296944-ab6fb57b0bdd?w=400&auto=format&fit=crop&q=80',
     is_unlimited_stock: false,
     stock: 15,
     is_active: true,
@@ -176,8 +176,8 @@ export const INITIAL_MENUS: MenuItem[] = [
     id: 'menu-snack-2',
     category_id: 'cat-snack',
     name: 'Kentang Goreng Renyah',
-    description: 'Shoestring french fries renyah keemasan disajikan dengan saus sambal dan mayones.',
     price: 14000,
+    image_url: 'https://images.unsplash.com/photo-1576107232684-1279f3908594?w=400&auto=format&fit=crop&q=80',
     is_unlimited_stock: false,
     stock: 20,
     is_active: true,
@@ -188,8 +188,8 @@ export const INITIAL_MENUS: MenuItem[] = [
     id: 'menu-snack-3',
     category_id: 'cat-snack',
     name: 'Pisang Goreng Crispy Keju',
-    description: 'Pisang kepok manis berbalut tepung renyah dengan susu kental manis dan keju.',
     price: 15000,
+    image_url: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400&auto=format&fit=crop&q=80',
     is_unlimited_stock: false,
     stock: 12,
     is_active: true,
@@ -200,8 +200,8 @@ export const INITIAL_MENUS: MenuItem[] = [
     id: 'menu-snack-4',
     category_id: 'cat-snack',
     name: 'Cireng Bumbu Rujak (Isi 8)',
-    description: 'Cireng kenyal gurih digoreng panas ditemani cocolan sambal rujak asam manis pedas.',
     price: 12000,
+    image_url: 'https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?w=400&auto=format&fit=crop&q=80',
     is_unlimited_stock: false,
     stock: 18,
     is_active: true,
@@ -237,6 +237,14 @@ export async function seedDatabaseIfEmpty(): Promise<boolean> {
     return true;
   }
 
+  // Update image_url untuk menu bawaan yang belum memiliki gambar
+  for (const initMenu of INITIAL_MENUS) {
+    const existing = await db.menus.get(initMenu.id);
+    if (existing && !existing.image_url && initMenu.image_url) {
+      await db.menus.update(initMenu.id, { image_url: initMenu.image_url });
+    }
+  }
+
   // Pastikan PIN default ada meskipun DB sudah pernah di-seed sebelumnya
   const cashierPin = await db.settings.get('auth_cashier_pin');
   if (!cashierPin) {
@@ -245,7 +253,6 @@ export async function seedDatabaseIfEmpty(): Promise<boolean> {
 
   const adminPin = await db.settings.get('auth_admin_pin');
   if (!adminPin) {
-    // Cek jika sebelumnya tersimpan sebagai auth_owner_pin
     const oldOwner = await db.settings.get('auth_owner_pin');
     await db.settings.put({ key: 'auth_admin_pin', value: oldOwner?.value || '8888' });
   }

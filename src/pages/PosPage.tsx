@@ -157,16 +157,6 @@ export const PosPage: React.FC = () => {
             </div>
           )}
 
-          {activeTab === 'pos' && (
-            <div className="pos-search-container">
-              <SearchBar
-                value={searchQuery}
-                onChange={setSearchQuery}
-                placeholder="Cari menu kafe (nama / deskripsi)..."
-              />
-            </div>
-          )}
-
           {/* Auth & Session Controls */}
           <div className="pos-auth-controls">
             <div className={`pos-role-tag ${isAdmin ? 'pos-role-tag--owner' : 'pos-role-tag--cashier'}`}>
@@ -202,14 +192,23 @@ export const PosPage: React.FC = () => {
         {/* Dynamic View Body based on Active Tab */}
         {activeTab === 'pos' ? (
           <>
-            {/* Kategori Tabs */}
+            {/* Kategori Tabs & Search Form Sejajar */}
             <div className="pos-categories-bar">
-              <CategoryTabs
-                categories={categories || []}
-                selectedCategory={selectedCategory}
-                onSelectCategory={setSelectedCategory}
-                totalCount={menus?.length}
-              />
+              <div className="pos-categories-and-search">
+                <CategoryTabs
+                  categories={categories || []}
+                  selectedCategory={selectedCategory}
+                  onSelectCategory={setSelectedCategory}
+                  totalCount={menus?.length}
+                />
+                <div className="pos-inline-search">
+                  <SearchBar
+                    value={searchQuery}
+                    onChange={setSearchQuery}
+                    placeholder="Cari menu..."
+                  />
+                </div>
+              </div>
             </div>
 
             {/* Menu Grid Scroll Area */}
