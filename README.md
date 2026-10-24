@@ -49,16 +49,47 @@
 ## Struktur Proyek
 
 ```text
-appkriscafe/
-├── .skills/                          # Knowledge Base & Aturan Arsitektur
-│   ├── stack-and-architecture.md
-│   ├── ui-ux-anti-slop-guidelines.md
-│   ├── backend-and-database.md
-│   └── frontend-state-and-routing.md
+├── .skills/                          # Knowledge Base & Aturan Arsitektur (Lokal)
 ├── docs/                             # Dokumentasi Teknis
 │   ├── MASTER_PLAN.md                # Master Blueprint, Roadmap, User Flow & Master Prompt
 │   ├── PRD.md                        # Product Requirements Document
 │   └── DATABASE_SCHEMA.md            # Skema Entitas Relasional & Dexie
-├── brain.md                          # Panduan arsitektur sistem
+├── android/                          # Proyek Native Android (Capacitor)
+├── public/                           # Aset Ikon PWA & Favicon
+├── src/                              # Source Code Aplikasi POS
+├── capacitor.config.ts               # Konfigurasi Capacitor Native
+├── vite.config.ts                    # Konfigurasi Vite & PWA Service Worker
 ├── .gitignore                        # Konfigurasi Git ignore
 └── README.md                         # Dokumentasi utama proyek
+```
+
+---
+
+## 🏃 Cara Menjalankan Aplikasi
+
+### 1. Mode Development (Web)
+```bash
+# Jalankan dev server lokal
+npm run dev
+# Buka di browser: http://localhost:5173
+```
+
+### 2. Instalasi PWA di Tablet / Smartphone (Tanpa Install Play Store)
+1. Buka browser **Google Chrome** di tablet atau smartphone Android Anda.
+2. Akses alamat web KrisCafe.
+3. Tekan menu titik tiga di kanan atas Chrome, lalu pilih **"Tambahkan ke Layar Utama" (Add to Home screen)** atau klik ikon install di address bar.
+4. Aplikasi akan terpasang di layar beranda tablet dan dapat dibuka *fullscreen* tanpa *address bar*, serta **100% tetap berfungsi meski WiFi/internet mati**.
+
+### 3. Membangun Installer Android Native (.apk) via Capacitor
+```bash
+# 1. Build aset web & sinkronisasi ke folder Android:
+npm run build:android
+
+# 2. Buka proyek di Android Studio untuk generate file .apk:
+npm run cap:open
+
+# Atau build APK langsung dari terminal (jika Android SDK / Gradle terpasang):
+cd android
+./gradlew assembleDebug
+# File APK akan berada di: android/app/build/outputs/apk/debug/app-debug.apk
+```

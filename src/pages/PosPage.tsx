@@ -134,10 +134,10 @@ export const PosPage: React.FC = () => {
 
           <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
             <Badge variant="accent">
-              <Wifi size={12} /> Local DB
+              <Wifi size={12} /> Offline PWA
             </Badge>
             <Badge variant="success">
-              <CheckCircle2 size={12} /> Phase 4 Live
+              <CheckCircle2 size={12} /> Android Ready
             </Badge>
           </div>
         </header>
