@@ -50,3 +50,10 @@ android/.gradle/
 android/build/
 android/captures/
 android/local.properties
+
+# Private Guidelines & AI Brain
+.skills/
+brain.md
+brain/
+docs/
+
