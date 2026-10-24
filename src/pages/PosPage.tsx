@@ -9,6 +9,7 @@ import { SearchBar } from '../components/pos/SearchBar';
 import { MenuGrid } from '../components/pos/MenuGrid';
 import { CartSidebar } from '../components/pos/CartSidebar';
 import { ItemNotesModal } from '../components/pos/ItemNotesModal';
+import { PaymentModal } from '../components/pos/PaymentModal';
 import { Badge } from '../components/common/Badge';
 import './PosPage.css';
 
@@ -16,7 +17,7 @@ export const PosPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [notesModalMenu, setNotesModalMenu] = useState<MenuItem | null>(null);
-  const [checkoutNotification, setCheckoutNotification] = useState<string | null>(null);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState<boolean>(false);
 
   const { items: cartItems, addItem } = useCartStore();
 
@@ -56,10 +57,7 @@ export const PosPage: React.FC = () => {
   };
 
   const handleProceedToCheckout = () => {
-    setCheckoutNotification('Phase 2 Sukses: Keranjang siap dialirkan ke Mesin Checkout & Cetak Struk (Phase 3)!');
-    setTimeout(() => {
-      setCheckoutNotification(null);
-    }, 4000);
+    setIsPaymentModalOpen(true);
   };
 
   return (
@@ -94,7 +92,7 @@ export const PosPage: React.FC = () => {
               <Wifi size={12} /> Local DB
             </Badge>
             <Badge variant="success">
-              <CheckCircle2 size={12} /> Phase 2 Core
+              <CheckCircle2 size={12} /> Phase 3 Live
             </Badge>
           </div>
         </header>
@@ -111,25 +109,6 @@ export const PosPage: React.FC = () => {
 
         {/* Menu Grid Scroll Area */}
         <div className="pos-menu-scroll-area">
-          {checkoutNotification && (
-            <div style={{
-              backgroundColor: 'var(--status-success-subtle)',
-              border: '1px solid rgba(16, 185, 129, 0.3)',
-              borderRadius: 'var(--radius-md)',
-              padding: 'var(--space-3) var(--space-4)',
-              color: 'var(--status-success)',
-              fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--weight-semibold)',
-              marginBottom: 'var(--space-4)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 'var(--space-2)'
-            }}>
-              <CheckCircle2 size={18} />
-              <span>{checkoutNotification}</span>
-            </div>
-          )}
-
           <MenuGrid
             menus={menus || []}
             cartItemCounts={cartItemCounts}
@@ -148,6 +127,12 @@ export const PosPage: React.FC = () => {
         isOpen={notesModalMenu !== null}
         onClose={() => setNotesModalMenu(null)}
         onConfirm={handleConfirmNotes}
+      />
+
+      {/* Modal Pembayaran, Kalkulator Cepat & Cetak Struk */}
+      <PaymentModal
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
       />
     </div>
   );

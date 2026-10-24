@@ -1,0 +1,133 @@
+/* Tampilan di Layar (Preview Mode) */
+.thermal-receipt-container {
+  width: 100%;
+  max-width: 320px;
+  background-color: #FFFFFF;
+  color: #111827;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 0 auto;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.receipt-header {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.receipt-store-title {
+  font-size: 16px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #000000;
+}
+
+.receipt-store-sub {
+  font-size: 10px;
+  color: #4B5563;
+  margin-top: 2px;
+}
+
+.receipt-divider {
+  border: none;
+  border-top: 1px dashed #6B7280;
+  margin: 8px 0;
+}
+
+.receipt-meta-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #374151;
+  margin-bottom: 2px;
+}
+
+.receipt-items-table {
+  width: 100%;
+  margin: 8px 0;
+  border-collapse: collapse;
+}
+
+.receipt-item-title-row {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  color: #000000;
+}
+
+.receipt-item-notes {
+  font-size: 10px;
+  font-style: italic;
+  color: #4B5563;
+  margin-left: 8px;
+}
+
+.receipt-summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  margin-bottom: 3px;
+}
+
+.receipt-summary-total {
+  font-size: 14px;
+  font-weight: 800;
+  color: #000000;
+  margin: 4px 0;
+  padding-top: 4px;
+  border-top: 1px dashed #000000;
+}
+
+.receipt-footer-text {
+  text-align: center;
+  font-size: 10px;
+  color: #4B5563;
+  margin-top: 12px;
+}
+
+/* ========================================================
+   ATURAN CETAK PRINTER THERMAL (@media print)
+   Khusus kertas roll 58mm / 80mm
+   ======================================================== */
+@media print {
+  @page {
+    size: 58mm auto;
+    margin: 0;
+  }
+
+  body {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Sembunyikan seluruh elemen antarmuka aplikasi */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Tampilkan hanya area struk thermal */
+  #thermal-receipt-print-area,
+  #thermal-receipt-print-area * {
+    visibility: visible;
+  }
+
+  #thermal-receipt-print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 48mm; /* Lebar efektif cetak roll 58mm */
+    padding: 4mm 2mm;
+    margin: 0 auto;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    font-size: 10pt;
+    color: #000000 !important;
+  }
+}
