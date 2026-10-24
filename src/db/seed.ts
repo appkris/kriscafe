@@ -216,7 +216,9 @@ export const INITIAL_SETTINGS: StoreSetting[] = [
   { key: 'store_address', value: 'Kantin Sentral Lt. 1, Blok B-08' },
   { key: 'store_phone', value: '081234567890' },
   { key: 'receipt_footer', value: 'Terima kasih atas kunjungannya! Selamat menikmati hidangan.' },
-  { key: 'currency_symbol', value: 'Rp' }
+  { key: 'currency_symbol', value: 'Rp' },
+  { key: 'auth_cashier_pin', value: '1234' },
+  { key: 'auth_owner_pin', value: '8888' }
 ];
 
 /**
@@ -233,6 +235,13 @@ export async function seedDatabaseIfEmpty(): Promise<boolean> {
     });
     console.log('✅ KrisCafe IndexedDB successfully seeded with initial categories & menus.');
     return true;
+  }
+
+  // Pastikan PIN default ada meskipun DB sudah pernah di-seed sebelumnya
+  const cashierPin = await db.settings.get('auth_cashier_pin');
+  if (!cashierPin) {
+    await db.settings.put({ key: 'auth_cashier_pin', value: '1234' });
+    await db.settings.put({ key: 'auth_owner_pin', value: '8888' });
   }
 
   return false;

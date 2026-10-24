@@ -32,6 +32,12 @@
    * Daftar menu terlaris (*Best Sellers*).
    * Rekap kasir harian (*Open Cash* vs *Close Cash*) untuk mendeteksi selisih uang kas.
 
+6. **Keamanan Quick PIN 4-Digit & Role Guard (Kasir vs Owner):**
+   * Keypad sentuh 4-digit instan (1-2 detik) tanpa mengetik email/password yang memperlambat antrean.
+   * **Role Kasir (Default PIN `1234`):** Operasi transaksi kasir, cetak struk, kalkulator tunai. Dibatasi dari melihat omzet harian atau mengubah harga/stok menu.
+   * **Role Owner / Supervisor (Default PIN `8888`):** Akses penuh ke Laporan Penjualan, Rekap Shift, Kelola Menu & Harga, serta Pengaturan PIN.
+   * **Fitur Kunci Layar (Screen Lock):** Tombol cepat untuk mengunci tablet saat kasir meninggalkan meja.
+
 ---
 
 ## Tech Stack & Bahan
@@ -52,6 +58,7 @@
 ├── .skills/                          # Knowledge Base & Aturan Arsitektur (Lokal)
 ├── docs/                             # Dokumentasi Teknis
 │   ├── MASTER_PLAN.md                # Master Blueprint, Roadmap, User Flow & Master Prompt
+│   ├── SECURITY_AUTH_PLAN.md         # Rencana Keamanan, PIN Auth & Role Guard
 │   ├── PRD.md                        # Product Requirements Document
 │   └── DATABASE_SCHEMA.md            # Skema Entitas Relasional & Dexie
 ├── android/                          # Proyek Native Android (Capacitor)
