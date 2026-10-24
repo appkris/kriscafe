@@ -43,7 +43,9 @@ export interface Transaction {
   order_type: OrderType;
   cashier_name: string;
   status: TransactionStatus;
+  device_id?: string;         // Pondasi Multi-Device: e.g. KASIR-01, KASIR-02
   synced_to_server: boolean;
+  synced_at?: string;         // Timestamp saat data berhasil diunggah ke cloud
   created_at: string;
 }
 
@@ -62,6 +64,7 @@ export type ShiftStatus = 'OPEN' | 'CLOSED';
 
 export interface CashierShift {
   id: string;
+  device_id?: string;         // Pondasi Multi-Device: e.g. KASIR-01
   cashier_name: string;
   start_time: string;
   end_time?: string;

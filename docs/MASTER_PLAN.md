@@ -84,6 +84,18 @@
 * Build aset produksi web dan sinkronisasi ke folder Android (`npx cap sync android`).
 * *Deliverable:* File installer Android `.apk` yang siap di-install langsung di tablet kasir.
 
+### Phase 6: Single Login & Role-Based Access (Kasir vs Admin) [SELESAI]
+* Halaman Login sentuh di awal (`LoginPage.tsx`) dengan PIN 4-digit numerik.
+* **Role Kasir (PIN 1234):** Antarmuka terisolasi khusus transaksi kasir & cetak struk (tab laporan dan kelola menu disembunyikan sepenuhnya).
+* **Role Admin (PIN 8888):** Akses penuh ke 4 tab (Kasir, Laporan & Shift, Kelola Menu & Kategori, serta Pengaturan Sistem Kafe & PIN).
+* Tombol Kunci Layar (*Screen Lock*) dan Keluar (*Logout*) dengan sesi terpersist di `localStorage`.
+
+### Phase 7 (Roadmap Masa Depan): Multi-Device Cloud Sync Engine [PERENCANAAN]
+* Detail arsitektur didokumentasikan di `docs/CLOUD_SYNC_ROADMAP.md`.
+* Penanganan 2 device kasir (Register K1 & K2) dan 1 device admin owner via Cloud Database (Supabase / PostgreSQL).
+* Sinkronisasi transaksi dua arah (*Local-First background sync*) tanpa mengorbankan kecepatan offline kasir.
+* Agregasi omzet multi-kasir secara real-time di perangkat Owner.
+
 ---
 
 ## 3. Penentuan MVP (Scope In vs Scope Out)

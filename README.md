@@ -59,6 +59,7 @@
 ├── docs/                             # Dokumentasi Teknis
 │   ├── MASTER_PLAN.md                # Master Blueprint, Roadmap, User Flow & Master Prompt
 │   ├── SECURITY_AUTH_PLAN.md         # Rencana Keamanan, PIN Auth & Role Guard
+│   ├── CLOUD_SYNC_ROADMAP.md         # Roadmap Multi-Device (2 Kasir + 1 Owner) & Cloud Sync
 │   ├── PRD.md                        # Product Requirements Document
 │   └── DATABASE_SCHEMA.md            # Skema Entitas Relasional & Dexie
 ├── android/                          # Proyek Native Android (Capacitor)
