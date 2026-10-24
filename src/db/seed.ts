@@ -218,7 +218,7 @@ export const INITIAL_SETTINGS: StoreSetting[] = [
   { key: 'receipt_footer', value: 'Terima kasih atas kunjungannya! Selamat menikmati hidangan.' },
   { key: 'currency_symbol', value: 'Rp' },
   { key: 'auth_cashier_pin', value: '1234' },
-  { key: 'auth_owner_pin', value: '8888' }
+  { key: 'auth_admin_pin', value: '8888' }
 ];
 
 /**
@@ -241,7 +241,13 @@ export async function seedDatabaseIfEmpty(): Promise<boolean> {
   const cashierPin = await db.settings.get('auth_cashier_pin');
   if (!cashierPin) {
     await db.settings.put({ key: 'auth_cashier_pin', value: '1234' });
-    await db.settings.put({ key: 'auth_owner_pin', value: '8888' });
+  }
+
+  const adminPin = await db.settings.get('auth_admin_pin');
+  if (!adminPin) {
+    // Cek jika sebelumnya tersimpan sebagai auth_owner_pin
+    const oldOwner = await db.settings.get('auth_owner_pin');
+    await db.settings.put({ key: 'auth_admin_pin', value: oldOwner?.value || '8888' });
   }
 
   return false;

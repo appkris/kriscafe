@@ -11,10 +11,10 @@ interface ChangePinModalProps {
 export const ChangePinModal: React.FC<ChangePinModalProps> = ({ isOpen, onClose }) => {
   const { getStoredPins, changePin } = useAuthStore();
   const [currentCashierPin, setCurrentCashierPin] = useState<string>('1234');
-  const [currentOwnerPin, setCurrentOwnerPin] = useState<string>('8888');
+  const [currentAdminPin, setCurrentAdminPin] = useState<string>('8888');
 
   const [newCashierPin, setNewCashierPin] = useState<string>('');
-  const [newOwnerPin, setNewOwnerPin] = useState<string>('');
+  const [newAdminPin, setNewAdminPin] = useState<string>('');
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -24,9 +24,9 @@ export const ChangePinModal: React.FC<ChangePinModalProps> = ({ isOpen, onClose 
     getStoredPins().then((pins) => {
       if (isMounted) {
         setCurrentCashierPin(pins.cashierPin);
-        setCurrentOwnerPin(pins.ownerPin);
+        setCurrentAdminPin(pins.adminPin);
         setNewCashierPin(pins.cashierPin);
-        setNewOwnerPin(pins.ownerPin);
+        setNewAdminPin(pins.adminPin);
         setSaveMessage(null);
       }
     });
@@ -46,13 +46,13 @@ export const ChangePinModal: React.FC<ChangePinModalProps> = ({ isOpen, onClose 
       return;
     }
 
-    if (newOwnerPin.length !== 4 || !/^\d{4}$/.test(newOwnerPin)) {
-      setSaveMessage('PIN Owner harus tepat 4 angka numerik!');
+    if (newAdminPin.length !== 4 || !/^\d{4}$/.test(newAdminPin)) {
+      setSaveMessage('PIN Admin harus tepat 4 angka numerik!');
       return;
     }
 
     await changePin('CASHIER', newCashierPin);
-    await changePin('OWNER', newOwnerPin);
+    await changePin('ADMIN', newAdminPin);
 
     setSaveMessage('✅ PIN berhasil diperbarui!');
     setTimeout(() => {
@@ -93,18 +93,18 @@ export const ChangePinModal: React.FC<ChangePinModalProps> = ({ isOpen, onClose 
           </div>
 
           <div className="change-pin-group">
-            <label className="change-pin-label" htmlFor="ownerPinInput">
-              <span>PIN Owner (Laporan & Menu)</span>
-              <span className="change-pin-current">Aktif: {currentOwnerPin}</span>
+            <label className="change-pin-label" htmlFor="adminPinInput">
+              <span>PIN Admin (Laporan & Menu)</span>
+              <span className="change-pin-current">Aktif: {currentAdminPin}</span>
             </label>
             <input
-              id="ownerPinInput"
+              id="adminPinInput"
               type="password"
               inputMode="numeric"
               maxLength={4}
               className="change-pin-input"
-              value={newOwnerPin}
-              onChange={(e) => setNewOwnerPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+              value={newAdminPin}
+              onChange={(e) => setNewAdminPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
               placeholder="4 Angka"
               required
             />

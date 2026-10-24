@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { db } from '../db';
-import type { UserSession, PinVerifyResult } from '../types/auth';
+import type { UserRole, UserSession, PinVerifyResult } from '../types/auth';
+
+const STORAGE_SESSION_KEY = 'kriscafe_active_session';
 
 interface AuthState {
   currentSession: UserSession | null;
@@ -8,21 +10,31 @@ interface AuthState {
 
   // Actions
   initAuth: () => Promise<void>;
+  loginWithPin: (pin: string, preferredRole?: UserRole) => Promise<PinVerifyResult>;
   unlockWithPin: (pin: string) => Promise<PinVerifyResult>;
-  verifyOwnerPin: (pin: string) => Promise<boolean>;
+  verifyAdminPin: (pin: string) => Promise<boolean>;
   lockScreen: () => void;
   logout: () => void;
-  changePin: (type: 'CASHIER' | 'OWNER', newPin: string) => Promise<boolean>;
-  getStoredPins: () => Promise<{ cashierPin: string; ownerPin: string }>;
+  changePin: (type: 'CASHIER' | 'ADMIN', newPin: string) => Promise<boolean>;
+  getStoredPins: () => Promise<{ cashierPin: string; adminPin: string }>;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  // Default saat aplikasi dimuat: sesi Kasir aktif
-  currentSession: {
-    role: 'CASHIER',
-    name: 'Kasir Staff',
-    loginTime: new Date().toISOString()
-  },
+function getSavedSession(): UserSession | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_SESSION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed && (parsed.role === 'CASHIER' || parsed.role === 'ADMIN')) {
+      return parsed;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export const useAuthStore = create<AuthState>((set, get) => ({
+  currentSession: getSavedSession(),
   isScreenLocked: false,
 
   initAuth: async () => {
@@ -30,44 +42,101 @@ export const useAuthStore = create<AuthState>((set) => ({
     const cashier = await db.settings.get('auth_cashier_pin');
     if (!cashier) {
       await db.settings.put({ key: 'auth_cashier_pin', value: '1234' });
-      await db.settings.put({ key: 'auth_owner_pin', value: '8888' });
+    }
+
+    const admin = await db.settings.get('auth_admin_pin');
+    if (!admin) {
+      const oldOwner = await db.settings.get('auth_owner_pin');
+      await db.settings.put({ key: 'auth_admin_pin', value: oldOwner?.value || '8888' });
     }
   },
 
-  unlockWithPin: async (pin: string): Promise<PinVerifyResult> => {
-    const cashierSetting = await db.settings.get('auth_cashier_pin');
-    const ownerSetting = await db.settings.get('auth_owner_pin');
+  loginWithPin: async (pin: string, preferredRole?: UserRole): Promise<PinVerifyResult> => {
+    const pins = await get().getStoredPins();
 
-    const cashierPin = cashierSetting?.value || '1234';
-    const ownerPin = ownerSetting?.value || '8888';
-
-    if (pin === ownerPin) {
-      const session: UserSession = {
-        role: 'OWNER',
-        name: 'Owner / Supervisor',
-        loginTime: new Date().toISOString()
-      };
-      set({ currentSession: session, isScreenLocked: false });
-      return { success: true, role: 'OWNER' };
+    // Mode preferensi Role tertentu
+    if (preferredRole === 'CASHIER') {
+      if (pin === pins.cashierPin) {
+        const session: UserSession = {
+          role: 'CASHIER',
+          name: 'Kasir Staff',
+          loginTime: new Date().toISOString()
+        };
+        localStorage.setItem(STORAGE_SESSION_KEY, JSON.stringify(session));
+        set({ currentSession: session, isScreenLocked: false });
+        return { success: true, role: 'CASHIER' };
+      }
+      return { success: false, message: 'PIN Kasir tidak sesuai (Default: 1234)' };
     }
 
-    if (pin === cashierPin) {
+    if (preferredRole === 'ADMIN') {
+      if (pin === pins.adminPin) {
+        const session: UserSession = {
+          role: 'ADMIN',
+          name: 'Administrator',
+          loginTime: new Date().toISOString()
+        };
+        localStorage.setItem(STORAGE_SESSION_KEY, JSON.stringify(session));
+        set({ currentSession: session, isScreenLocked: false });
+        return { success: true, role: 'ADMIN' };
+      }
+      return { success: false, message: 'PIN Admin tidak sesuai (Default: 8888)' };
+    }
+
+    // Mode Otomatis (Smart PIN detection)
+    if (pin === pins.adminPin) {
+      const session: UserSession = {
+        role: 'ADMIN',
+        name: 'Administrator',
+        loginTime: new Date().toISOString()
+      };
+      localStorage.setItem(STORAGE_SESSION_KEY, JSON.stringify(session));
+      set({ currentSession: session, isScreenLocked: false });
+      return { success: true, role: 'ADMIN' };
+    }
+
+    if (pin === pins.cashierPin) {
       const session: UserSession = {
         role: 'CASHIER',
         name: 'Kasir Staff',
         loginTime: new Date().toISOString()
       };
+      localStorage.setItem(STORAGE_SESSION_KEY, JSON.stringify(session));
       set({ currentSession: session, isScreenLocked: false });
       return { success: true, role: 'CASHIER' };
     }
 
-    return { success: false, message: 'PIN tidak sesuai. Silakan coba lagi.' };
+    return { success: false, message: 'PIN tidak terdaftar. Periksa kembali PIN Anda.' };
   },
 
-  verifyOwnerPin: async (pin: string): Promise<boolean> => {
-    const ownerSetting = await db.settings.get('auth_owner_pin');
-    const ownerPin = ownerSetting?.value || '8888';
-    return pin === ownerPin;
+  unlockWithPin: async (pin: string): Promise<PinVerifyResult> => {
+    const pins = await get().getStoredPins();
+    const current = get().currentSession;
+
+    // Admin PIN selalu dapat membuka kunci
+    if (pin === pins.adminPin) {
+      set({ isScreenLocked: false });
+      return { success: true, role: 'ADMIN' };
+    }
+
+    // Jika sedang dalam sesi Kasir dan PIN Kasir cocok
+    if (current?.role === 'CASHIER' && pin === pins.cashierPin) {
+      set({ isScreenLocked: false });
+      return { success: true, role: 'CASHIER' };
+    }
+
+    // Jika belum login atau sesi baru
+    if (pin === pins.cashierPin) {
+      set({ isScreenLocked: false });
+      return { success: true, role: 'CASHIER' };
+    }
+
+    return { success: false, message: 'PIN pembuka kunci tidak sesuai.' };
+  },
+
+  verifyAdminPin: async (pin: string): Promise<boolean> => {
+    const pins = await get().getStoredPins();
+    return pin === pins.adminPin;
   },
 
   lockScreen: () => {
@@ -75,22 +144,30 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   logout: () => {
-    set({ currentSession: null, isScreenLocked: true });
+    try {
+      localStorage.removeItem(STORAGE_SESSION_KEY);
+    } catch (e) {
+      console.warn('Could not clear local session storage', e);
+    }
+    set({ currentSession: null, isScreenLocked: false });
   },
 
-  changePin: async (type: 'CASHIER' | 'OWNER', newPin: string): Promise<boolean> => {
+  changePin: async (type: 'CASHIER' | 'ADMIN', newPin: string): Promise<boolean> => {
     if (newPin.length !== 4) return false;
-    const key = type === 'CASHIER' ? 'auth_cashier_pin' : 'auth_owner_pin';
+    const key = type === 'CASHIER' ? 'auth_cashier_pin' : 'auth_admin_pin';
     await db.settings.put({ key, value: newPin });
     return true;
   },
 
   getStoredPins: async () => {
     const cashier = await db.settings.get('auth_cashier_pin');
-    const owner = await db.settings.get('auth_owner_pin');
+    let admin = await db.settings.get('auth_admin_pin');
+    if (!admin) {
+      admin = await db.settings.get('auth_owner_pin');
+    }
     return {
       cashierPin: cashier?.value || '1234',
-      ownerPin: owner?.value || '8888'
+      adminPin: admin?.value || '8888'
     };
   }
 }));

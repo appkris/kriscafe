@@ -5,15 +5,17 @@ import {
   ShoppingBag, 
   TrendingUp, 
   SlidersHorizontal,
+  Sliders,
   Lock,
-  Crown,
-  User,
-  KeyRound
+  LogOut,
+  Shield,
+  User
 } from 'lucide-react';
 import { db, menuRepository } from '../db';
 import type { MenuItem } from '../types/database';
 import { useCartStore } from '../store/cartStore';
 import { useAuthStore } from '../store/authStore';
+import { LoginPage } from '../components/auth/LoginPage';
 import { CategoryTabs } from '../components/pos/CategoryTabs';
 import { SearchBar } from '../components/pos/SearchBar';
 import { MenuGrid } from '../components/pos/MenuGrid';
@@ -22,27 +24,24 @@ import { ItemNotesModal } from '../components/pos/ItemNotesModal';
 import { PaymentModal } from '../components/pos/PaymentModal';
 import { DailyReportsView } from '../components/reports/DailyReportsView';
 import { MenuManagementView } from '../components/menu/MenuManagementView';
+import { AdminSettingsView } from '../components/admin/AdminSettingsView';
 import { PinKeypadModal } from '../components/auth/PinKeypadModal';
-import { ChangePinModal } from '../components/auth/ChangePinModal';
 import './PosPage.css';
 
-type MainViewTab = 'pos' | 'reports' | 'menus';
+type MainViewTab = 'pos' | 'reports' | 'menus' | 'settings';
 
 export const PosPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<MainViewTab>('pos');
-  const [pendingTab, setPendingTab] = useState<MainViewTab | null>(null);
-  const [isSupervisorAuthOpen, setIsSupervisorAuthOpen] = useState<boolean>(false);
-  const [isChangePinOpen, setIsChangePinOpen] = useState<boolean>(false);
+  const { currentSession, isScreenLocked, lockScreen, logout, initAuth } = useAuthStore();
 
+  const [activeTab, setActiveTab] = useState<MainViewTab>('pos');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [notesModalMenu, setNotesModalMenu] = useState<MenuItem | null>(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState<boolean>(false);
 
   const { items: cartItems, addItem } = useCartStore();
-  const { currentSession, isScreenLocked, lockScreen, initAuth } = useAuthStore();
 
-  // Inisialisasi default PIN jika belum ada
+  // Inisialisasi default setting & PIN jika belum ada
   useEffect(() => {
     initAuth().catch(console.error);
   }, [initAuth]);
@@ -86,41 +85,12 @@ export const PosPage: React.FC = () => {
     setIsPaymentModalOpen(true);
   };
 
-  // Navigasi dengan Role Guard (Kasir vs Owner)
-  const handleTabNavigation = (targetTab: MainViewTab) => {
-    if (targetTab === 'pos') {
-      setActiveTab('pos');
-      return;
-    }
+  // Jika belum login, tampilkan Layar Login Halaman Awal
+  if (!currentSession) {
+    return <LoginPage />;
+  }
 
-    // Tab 'reports' dan 'menus' dilindungi PIN Supervisor/Owner
-    if (currentSession?.role === 'OWNER') {
-      setActiveTab(targetTab);
-    } else {
-      setPendingTab(targetTab);
-      setIsSupervisorAuthOpen(true);
-    }
-  };
-
-  const handleSupervisorAuthSuccess = () => {
-    if (pendingTab) {
-      setActiveTab(pendingTab);
-      setPendingTab(null);
-    }
-    setIsSupervisorAuthOpen(false);
-  };
-
-  const handleOpenPinSettings = () => {
-    if (currentSession?.role === 'OWNER') {
-      setIsChangePinOpen(true);
-    } else {
-      // Minta PIN Owner terlebih dahulu
-      setPendingTab(null);
-      setIsSupervisorAuthOpen(true);
-    }
-  };
-
-  const isOwner = currentSession?.role === 'OWNER';
+  const isAdmin = currentSession.role === 'ADMIN';
 
   return (
     <div className="pos-layout">
@@ -136,46 +106,56 @@ export const PosPage: React.FC = () => {
               <div className="pos-brand-name">KrisCafe POS</div>
               <div className="pos-brand-status">
                 <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: 'var(--status-success)', display: 'inline-block' }} />
-                <span>Kasir Siap • Shift 1</span>
+                <span>{isAdmin ? 'Mode Administrator' : 'Kasir Siap • Shift 1'}</span>
               </div>
             </div>
           </div>
 
-          {/* Navigation Mode Selector */}
-          <div style={{ display: 'flex', gap: 'var(--space-1)', backgroundColor: 'var(--bg-app)', padding: '3px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
-            <button
-              type="button"
-              id="tab-btn-pos"
-              className={`category-tab-btn ${activeTab === 'pos' ? 'category-tab-btn--active' : ''}`}
-              style={{ minHeight: '36px', padding: '0 12px', fontSize: '13px' }}
-              onClick={() => handleTabNavigation('pos')}
-            >
-              <ShoppingBag size={14} />
-              <span>Kasir</span>
-            </button>
-            <button
-              type="button"
-              id="tab-btn-reports"
-              className={`category-tab-btn ${activeTab === 'reports' ? 'category-tab-btn--active' : ''}`}
-              style={{ minHeight: '36px', padding: '0 12px', fontSize: '13px' }}
-              onClick={() => handleTabNavigation('reports')}
-            >
-              <TrendingUp size={14} />
-              <span>Laporan & Shift</span>
-              {!isOwner && <Lock size={11} style={{ opacity: 0.6, marginLeft: 2 }} />}
-            </button>
-            <button
-              type="button"
-              id="tab-btn-menus"
-              className={`category-tab-btn ${activeTab === 'menus' ? 'category-tab-btn--active' : ''}`}
-              style={{ minHeight: '36px', padding: '0 12px', fontSize: '13px' }}
-              onClick={() => handleTabNavigation('menus')}
-            >
-              <SlidersHorizontal size={14} />
-              <span>Kelola Menu</span>
-              {!isOwner && <Lock size={11} style={{ opacity: 0.6, marginLeft: 2 }} />}
-            </button>
-          </div>
+          {/* Navigation Tab Selector: HANYA DITAMPILKAN JIKA ROLE ADMIN */}
+          {isAdmin && (
+            <div style={{ display: 'flex', gap: 'var(--space-1)', backgroundColor: 'var(--bg-app)', padding: '3px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+              <button
+                type="button"
+                id="tab-btn-pos"
+                className={`category-tab-btn ${activeTab === 'pos' ? 'category-tab-btn--active' : ''}`}
+                style={{ minHeight: '36px', padding: '0 12px', fontSize: '13px' }}
+                onClick={() => setActiveTab('pos')}
+              >
+                <ShoppingBag size={14} />
+                <span>Kasir</span>
+              </button>
+              <button
+                type="button"
+                id="tab-btn-reports"
+                className={`category-tab-btn ${activeTab === 'reports' ? 'category-tab-btn--active' : ''}`}
+                style={{ minHeight: '36px', padding: '0 12px', fontSize: '13px' }}
+                onClick={() => setActiveTab('reports')}
+              >
+                <TrendingUp size={14} />
+                <span>Laporan & Shift</span>
+              </button>
+              <button
+                type="button"
+                id="tab-btn-menus"
+                className={`category-tab-btn ${activeTab === 'menus' ? 'category-tab-btn--active' : ''}`}
+                style={{ minHeight: '36px', padding: '0 12px', fontSize: '13px' }}
+                onClick={() => setActiveTab('menus')}
+              >
+                <SlidersHorizontal size={14} />
+                <span>Kelola Menu</span>
+              </button>
+              <button
+                type="button"
+                id="tab-btn-settings"
+                className={`category-tab-btn ${activeTab === 'settings' ? 'category-tab-btn--active' : ''}`}
+                style={{ minHeight: '36px', padding: '0 12px', fontSize: '13px' }}
+                onClick={() => setActiveTab('settings')}
+              >
+                <Sliders size={14} />
+                <span>Pengaturan</span>
+              </button>
+            </div>
+          )}
 
           {activeTab === 'pos' && (
             <div className="pos-search-container">
@@ -187,33 +167,34 @@ export const PosPage: React.FC = () => {
             </div>
           )}
 
-          {/* Security & Role Controls */}
+          {/* Auth & Session Controls */}
           <div className="pos-auth-controls">
-            <div className={`pos-role-tag ${isOwner ? 'pos-role-tag--owner' : 'pos-role-tag--cashier'}`}>
-              {isOwner ? <Crown size={13} /> : <User size={13} />}
-              <span>{isOwner ? 'Owner' : 'Kasir'}</span>
+            <div className={`pos-role-tag ${isAdmin ? 'pos-role-tag--owner' : 'pos-role-tag--cashier'}`}>
+              {isAdmin ? <Shield size={13} /> : <User size={13} />}
+              <span>{isAdmin ? 'Admin' : 'Kasir'}</span>
             </div>
-
-            <button
-              type="button"
-              id="btn-pin-settings"
-              className="pos-icon-btn"
-              onClick={handleOpenPinSettings}
-              title="Pengaturan PIN Keamanan"
-            >
-              <KeyRound size={14} />
-              <span className="hide-mobile">PIN</span>
-            </button>
 
             <button
               type="button"
               id="btn-lock-screen"
               className="pos-icon-btn"
               onClick={lockScreen}
-              title="Kunci Layar Kasir"
+              title="Kunci Layar Sentuh"
             >
               <Lock size={14} />
-              <span>Kunci</span>
+              <span className="hide-mobile">Kunci</span>
+            </button>
+
+            <button
+              type="button"
+              id="btn-logout"
+              className="pos-icon-btn"
+              onClick={logout}
+              title="Keluar ke Halaman Awal"
+              style={{ color: 'var(--status-danger)', borderColor: 'rgba(239, 68, 68, 0.3)' }}
+            >
+              <LogOut size={14} />
+              <span>Keluar</span>
             </button>
           </div>
         </header>
@@ -245,9 +226,13 @@ export const PosPage: React.FC = () => {
           <div style={{ flex: 1, overflowY: 'auto' }}>
             <DailyReportsView />
           </div>
-        ) : (
+        ) : activeTab === 'menus' ? (
           <div style={{ flex: 1, overflowY: 'auto' }}>
             <MenuManagementView />
+          </div>
+        ) : (
+          <div style={{ flex: 1, overflowY: 'auto' }}>
+            <AdminSettingsView />
           </div>
         )}
       </section>
@@ -271,34 +256,14 @@ export const PosPage: React.FC = () => {
         onClose={() => setIsPaymentModalOpen(false)}
       />
 
-      {/* Modal Otorisasi Supervisor (Saat Kasir mencoba akses Laporan/Menu) */}
-      <PinKeypadModal
-        isOpen={isSupervisorAuthOpen}
-        title="Otorisasi Supervisor"
-        subtitle="Masukkan PIN Owner (8888) untuk membuka hak akses ini"
-        requiredRole="OWNER"
-        hintText="Default PIN Owner: 8888"
-        onSuccess={handleSupervisorAuthSuccess}
-        onCancel={() => {
-          setPendingTab(null);
-          setIsSupervisorAuthOpen(false);
-        }}
-      />
-
-      {/* Modal Kunci Layar Penuh (Saat tombol Kunci ditekan) */}
+      {/* Modal Kunci Layar (Screen Lock) */}
       <PinKeypadModal
         isOpen={isScreenLocked}
         title="KrisCafe POS Terkunci"
-        subtitle="Masukkan PIN Kasir (1234) atau PIN Owner (8888) untuk membuka"
+        subtitle="Masukkan PIN untuk membuka kembali layar kasir"
         requiredRole="ANY"
-        hintText="Kasir: 1234 | Owner: 8888"
+        hintText={isAdmin ? 'Admin: 8888' : 'Kasir: 1234'}
         onSuccess={() => {}}
-      />
-
-      {/* Modal Ubah PIN Kasir & Owner */}
-      <ChangePinModal
-        isOpen={isChangePinOpen}
-        onClose={() => setIsChangePinOpen(false)}
       />
     </div>
   );

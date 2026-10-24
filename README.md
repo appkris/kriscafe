@@ -32,11 +32,11 @@
    * Daftar menu terlaris (*Best Sellers*).
    * Rekap kasir harian (*Open Cash* vs *Close Cash*) untuk mendeteksi selisih uang kas.
 
-6. **Keamanan Quick PIN 4-Digit & Role Guard (Kasir vs Owner):**
-   * Keypad sentuh 4-digit instan (1-2 detik) tanpa mengetik email/password yang memperlambat antrean.
-   * **Role Kasir (Default PIN `1234`):** Operasi transaksi kasir, cetak struk, kalkulator tunai. Dibatasi dari melihat omzet harian atau mengubah harga/stok menu.
-   * **Role Owner / Supervisor (Default PIN `8888`):** Akses penuh ke Laporan Penjualan, Rekap Shift, Kelola Menu & Harga, serta Pengaturan PIN.
-   * **Fitur Kunci Layar (Screen Lock):** Tombol cepat untuk mengunci tablet saat kasir meninggalkan meja.
+6. **Layar Login Awal & Pemisahan Hak Akses (Kasir vs Admin):**
+   * **Login Sekali di Awal (Dedicated Login Screen):** Tidak perlu input PIN berulang-ulang di setiap tab. Cukup login sekali saat membuka aplikasi di awal shift.
+   * **Area Kasir Eksklusif (Default PIN `1234`):** Kasir hanya melihat katalog menu, filter kategori, pencarian, dan keranjang sentuh. Tab laporan omzet harian, manajemen menu, dan pengaturan sistem **disembunyikan sepenuhnya** sehingga operasional fokus dan aman.
+   * **Otoritas Penuh Admin (Default PIN `8888`):** Administrator memiliki akses ke seluruh 4 tab: Kasir, Laporan & Shift, Kelola Menu & Stok, serta **Pengaturan Sistem** (profil kafe, format struk, ganti PIN, & reset database demo).
+   * **Tombol Kunci & Logout:** Tombol Kunci Layar sentuh untuk mengamankan kasir sementara dan tombol Keluar (Logout) untuk mengakhiri sesi kerja.
 
 ---
 

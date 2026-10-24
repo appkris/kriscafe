@@ -8,7 +8,7 @@ interface PinKeypadModalProps {
   isOpen: boolean;
   title?: string;
   subtitle?: string;
-  requiredRole?: 'OWNER' | 'ANY';
+  requiredRole?: 'ADMIN' | 'ANY';
   hintText?: string;
   onSuccess: (role?: UserRole) => void;
   onCancel?: () => void;
@@ -19,14 +19,14 @@ export const PinKeypadModal: React.FC<PinKeypadModalProps> = ({
   title = 'Masukkan PIN',
   subtitle = 'Masukkan 4 digit PIN otorisasi',
   requiredRole = 'ANY',
-  hintText = 'Default Kasir: 1234 | Owner: 8888',
+  hintText = 'Default Kasir: 1234 | Admin: 8888',
   onSuccess,
   onCancel,
 }) => {
   const [pin, setPin] = useState<string>('');
   const [isError, setIsError] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
-  const { unlockWithPin, verifyOwnerPin } = useAuthStore();
+  const { unlockWithPin, verifyAdminPin } = useAuthStore();
 
   const handleDigit = useCallback((digit: string) => {
     if (pin.length < 4) {
@@ -55,16 +55,16 @@ export const PinKeypadModal: React.FC<PinKeypadModalProps> = ({
     let isMounted = true;
 
     const verify = async () => {
-      if (requiredRole === 'OWNER') {
-        const isOwner = await verifyOwnerPin(pin);
+      if (requiredRole === 'ADMIN') {
+        const isAdmin = await verifyAdminPin(pin);
         if (!isMounted) return;
 
-        if (isOwner) {
+        if (isAdmin) {
           setPin('');
-          onSuccess('OWNER');
+          onSuccess('ADMIN');
         } else {
           setIsError(true);
-          setErrorMessage('PIN Owner salah! Hanya Owner/Supervisor yang diizinkan.');
+          setErrorMessage('PIN Admin salah! Hanya Administrator yang diizinkan.');
           setTimeout(() => {
             if (isMounted) setPin('');
           }, 350);
@@ -91,7 +91,7 @@ export const PinKeypadModal: React.FC<PinKeypadModalProps> = ({
     return () => {
       isMounted = false;
     };
-  }, [pin, requiredRole, verifyOwnerPin, unlockWithPin, onSuccess]);
+  }, [pin, requiredRole, verifyAdminPin, unlockWithPin, onSuccess]);
 
   // Support physical keyboard
   useEffect(() => {
@@ -141,14 +141,14 @@ export const PinKeypadModal: React.FC<PinKeypadModalProps> = ({
           width: '48px',
           height: '48px',
           borderRadius: 'var(--radius-pill)',
-          backgroundColor: requiredRole === 'OWNER' ? 'rgba(234, 179, 8, 0.15)' : 'rgba(224, 138, 60, 0.15)',
-          color: requiredRole === 'OWNER' ? 'var(--status-warning)' : 'var(--accent-hover)',
+          backgroundColor: requiredRole === 'ADMIN' ? 'rgba(234, 179, 8, 0.15)' : 'rgba(224, 138, 60, 0.15)',
+          color: requiredRole === 'ADMIN' ? 'var(--status-warning)' : 'var(--accent-hover)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           marginBottom: 'var(--space-2)'
         }}>
-          {requiredRole === 'OWNER' ? <ShieldAlert size={26} /> : <Lock size={26} />}
+          {requiredRole === 'ADMIN' ? <ShieldAlert size={26} /> : <Lock size={26} />}
         </div>
 
         <div>
@@ -156,7 +156,7 @@ export const PinKeypadModal: React.FC<PinKeypadModalProps> = ({
           <p className="pin-modal-subtitle">{subtitle}</p>
         </div>
 
-        {/* 4 Dot Indicator */}
+        {/* 4 Bulatan Indikator PIN */}
         <div className={`pin-dots-container ${isError ? 'pin-shake' : ''}`}>
           {[0, 1, 2, 3].map((idx) => {
             const isFilled = pin.length > idx;
@@ -186,6 +186,7 @@ export const PinKeypadModal: React.FC<PinKeypadModalProps> = ({
             <button
               key={digit}
               type="button"
+              id={`keypad-digit-${digit}`}
               className="pin-key-btn"
               onClick={() => handleDigit(digit)}
             >
@@ -194,6 +195,7 @@ export const PinKeypadModal: React.FC<PinKeypadModalProps> = ({
           ))}
           <button
             type="button"
+            id="keypad-clear"
             className="pin-key-btn pin-key-btn--action"
             onClick={handleClear}
             title="Bersihkan"
@@ -202,6 +204,7 @@ export const PinKeypadModal: React.FC<PinKeypadModalProps> = ({
           </button>
           <button
             type="button"
+            id="keypad-digit-0"
             className="pin-key-btn"
             onClick={() => handleDigit('0')}
           >
@@ -209,6 +212,7 @@ export const PinKeypadModal: React.FC<PinKeypadModalProps> = ({
           </button>
           <button
             type="button"
+            id="keypad-delete"
             className="pin-key-btn pin-key-btn--action"
             onClick={handleDelete}
             title="Hapus Digit"

@@ -1,4 +1,4 @@
-export type UserRole = 'CASHIER' | 'OWNER';
+export type UserRole = 'CASHIER' | 'ADMIN';
 
 export interface UserSession {
   role: UserRole;
