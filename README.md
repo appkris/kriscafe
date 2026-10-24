@@ -56,6 +56,7 @@ appkriscafe/
 │   ├── backend-and-database.md
 │   └── frontend-state-and-routing.md
 ├── docs/                             # Dokumentasi Teknis
+│   ├── MASTER_PLAN.md                # Master Blueprint, Roadmap, User Flow & Master Prompt
 │   ├── PRD.md                        # Product Requirements Document
 │   └── DATABASE_SCHEMA.md            # Skema Entitas Relasional & Dexie
 ├── brain.md                          # Panduan arsitektur sistem
