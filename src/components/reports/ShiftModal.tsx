@@ -25,24 +25,35 @@ export const ShiftModal: React.FC<ShiftModalProps> = ({
   const isOpening = !activeShift;
 
   const [cashierName, setCashierName] = useState<string>('Kasir Utama');
-  const [startingCash, setStartingCash] = useState<number>(100000);
+  const [startingCashText, setStartingCashText] = useState<string>('100000');
+  const startingCash = Number(startingCashText.replace(/[^0-9]/g, '')) || 0;
+  const [internalCashSales, setInternalCashSales] = useState<number>(cashSalesTotal);
   const [actualCashText, setActualCashText] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  const expectedCash = activeShift ? activeShift.starting_cash + cashSalesTotal : 0;
+  const effectiveCashSales = activeShift ? internalCashSales : 0;
+  const expectedCash = activeShift ? activeShift.starting_cash + effectiveCashSales : 0;
   const actualCash = Number(actualCashText.replace(/[^0-9]/g, '')) || 0;
   const difference = actualCash - expectedCash;
 
   useEffect(() => {
     if (isOpen) {
       if (activeShift) {
-        setActualCashText(String(expectedCash));
+        shiftRepository.getCashSalesForShift(activeShift)
+          .then((sales) => {
+            setInternalCashSales(sales);
+            setActualCashText(String(activeShift.starting_cash + sales));
+          })
+          .catch(() => {
+            setInternalCashSales(cashSalesTotal);
+            setActualCashText(String(activeShift.starting_cash + cashSalesTotal));
+          });
       } else {
         setCashierName('Kasir Utama');
-        setStartingCash(100000);
+        setStartingCashText('100000');
       }
     }
-  }, [isOpen, activeShift, expectedCash]);
+  }, [isOpen, activeShift, cashSalesTotal]);
 
   if (!isOpen) return null;
 
@@ -121,8 +132,9 @@ export const ShiftModal: React.FC<ShiftModalProps> = ({
                   type="text"
                   className="shift-text-input"
                   style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-lg)', fontWeight: 'bold' }}
-                  value={receiptService.formatRupiah(startingCash)}
-                  readOnly
+                  value={startingCash ? receiptService.formatRupiah(startingCash) : ''}
+                  onChange={(e) => setStartingCashText(e.target.value.replace(/[^0-9]/g, ''))}
+                  placeholder="0"
                 />
                 <div className="shift-quick-buttons">
                   {[50000, 100000, 150000, 200000].map((amt) => (
@@ -130,7 +142,7 @@ export const ShiftModal: React.FC<ShiftModalProps> = ({
                       key={amt}
                       type="button"
                       className="shift-quick-btn"
-                      onClick={() => setStartingCash(amt)}
+                      onClick={() => setStartingCashText(String(amt))}
                     >
                       {amt / 1000}rb
                     </button>
@@ -157,7 +169,7 @@ export const ShiftModal: React.FC<ShiftModalProps> = ({
                 <div className="shift-info-row">
                   <span>Total Penjualan Tunai:</span>
                   <span className="font-mono" style={{ color: 'var(--accent-hover)' }}>
-                    +{receiptService.formatRupiah(cashSalesTotal)}
+                    +{receiptService.formatRupiah(effectiveCashSales)}
                   </span>
                 </div>
                 <div className="shift-info-row shift-info-row--highlight">

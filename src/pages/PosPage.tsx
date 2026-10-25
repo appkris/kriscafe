@@ -9,9 +9,11 @@ import {
   Lock,
   LogOut,
   Shield,
-  User
+  User,
+  Clock,
+  PlayCircle
 } from 'lucide-react';
-import { db, menuRepository } from '../db';
+import { db, menuRepository, shiftRepository } from '../db';
 import type { MenuItem } from '../types/database';
 import { useCartStore } from '../store/cartStore';
 import { useAuthStore } from '../store/authStore';
@@ -26,6 +28,7 @@ import { DailyReportsView } from '../components/reports/DailyReportsView';
 import { MenuManagementView } from '../components/menu/MenuManagementView';
 import { AdminSettingsView } from '../components/admin/AdminSettingsView';
 import { PinKeypadModal } from '../components/auth/PinKeypadModal';
+import { ShiftModal } from '../components/reports/ShiftModal';
 import './PosPage.css';
 
 type MainViewTab = 'pos' | 'reports' | 'menus' | 'settings';
@@ -38,6 +41,9 @@ export const PosPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [notesModalMenu, setNotesModalMenu] = useState<MenuItem | null>(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState<boolean>(false);
+  const [isShiftModalOpen, setIsShiftModalOpen] = useState<boolean>(false);
+
+  const activeShift = useLiveQuery(() => shiftRepository.getCurrentOpenShift(), []);
 
   const { items: cartItems, addItem } = useCartStore();
 
@@ -104,10 +110,20 @@ export const PosPage: React.FC = () => {
             </div>
             <div>
               <div className="pos-brand-name">KrisCafe POS</div>
-              <div className="pos-brand-status">
-                <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: 'var(--status-success)', display: 'inline-block' }} />
-                <span>{isAdmin ? 'Mode Administrator' : 'Kasir Siap • Shift 1'}</span>
-              </div>
+              <button
+                type="button"
+                id="pos-topbar-shift-badge"
+                className={`pos-brand-shift-btn ${activeShift ? 'pos-brand-shift-btn--active' : 'pos-brand-shift-btn--warning'}`}
+                onClick={() => setIsShiftModalOpen(true)}
+                title={activeShift ? 'Sesi Shift Aktif (Klik untuk info / tutup)' : 'Klik untuk Buka Shift Kasir Baru'}
+              >
+                <span className={`status-dot ${activeShift ? 'status-dot--active' : 'status-dot--warning'}`} />
+                <span>
+                  {activeShift 
+                    ? `Shift: ${activeShift.cashier_name}` 
+                    : 'Belum Ada Shift • Buka (+)'}
+                </span>
+              </button>
             </div>
           </div>
 
@@ -211,6 +227,25 @@ export const PosPage: React.FC = () => {
               </div>
             </div>
 
+            {/* Banner Pengingat Buka Shift Kasir jika belum ada shift aktif */}
+            {!activeShift && (
+              <div className="pos-shift-reminder-banner">
+                <div className="pos-shift-reminder-info">
+                  <Clock size={16} color="var(--accent-hover)" />
+                  <span>Sesi kasir belum dibuka. Silakan <strong>Buka Shift Baru</strong> untuk mencatat modal laci kas.</span>
+                </div>
+                <button
+                  type="button"
+                  id="btn-open-shift-banner"
+                  className="pos-shift-reminder-action"
+                  onClick={() => setIsShiftModalOpen(true)}
+                >
+                  <PlayCircle size={15} />
+                  <span>Buka Shift Sekarang</span>
+                </button>
+              </div>
+            )}
+
             {/* Menu Grid Scroll Area */}
             <div className="pos-menu-scroll-area">
               <MenuGrid
@@ -263,6 +298,14 @@ export const PosPage: React.FC = () => {
         requiredRole="ANY"
         hintText={isAdmin ? 'Admin: 8888' : 'Kasir: 1234'}
         onSuccess={() => {}}
+      />
+
+      {/* Modal Shift Kasir (Bisa diakses langsung oleh Kasir & Admin) */}
+      <ShiftModal
+        isOpen={isShiftModalOpen}
+        activeShift={activeShift}
+        onClose={() => setIsShiftModalOpen(false)}
+        onShiftUpdated={() => {}}
       />
     </div>
   );

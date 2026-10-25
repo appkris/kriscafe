@@ -9,7 +9,8 @@ import {
   X
 } from 'lucide-react';
 import { useCartStore } from '../../store/cartStore';
-import { transactionRepository } from '../../db';
+import { transactionRepository, shiftRepository } from '../../db';
+import { useLiveQuery } from 'dexie-react-hooks';
 import type { PaymentMethod, Transaction, TransactionItem } from '../../types/database';
 import { receiptService } from '../../services/receiptService';
 import { ThermalReceipt58 } from '../receipt/ThermalReceipt58';
@@ -29,6 +30,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
     clearCart 
   } = useCartStore();
 
+  const activeShift = useLiveQuery(() => shiftRepository.getCurrentOpenShift(), []);
   const total = getSubtotal();
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('CASH');
@@ -115,7 +117,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
         customerName: customerNameInput.trim() || undefined,
         tableNumber: tableNumberInput.trim() || undefined,
         orderType: orderType,
-        cashierName: 'Kasir Utama',
+        cashierName: activeShift?.cashier_name || 'Kasir Utama',
         items: checkoutItems
       });
 

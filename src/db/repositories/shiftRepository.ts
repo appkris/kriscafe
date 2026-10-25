@@ -57,5 +57,18 @@ export const shiftRepository = {
 
     await db.cashier_shifts.put(updatedShift);
     return updatedShift;
+  },
+
+  /**
+   * Menghitung total penjualan tunai yang terjadi selama rentang sesi shift ini
+   */
+  async getCashSalesForShift(shift: CashierShift): Promise<number> {
+    const cashTransactions = await db.transactions
+      .where('created_at')
+      .aboveOrEqual(shift.start_time)
+      .filter(t => t.payment_method === 'CASH' && t.status === 'COMPLETED')
+      .toArray();
+
+    return cashTransactions.reduce((acc, t) => acc + t.total, 0);
   }
 };
