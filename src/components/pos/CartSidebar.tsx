@@ -100,11 +100,13 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ onProceedToCheckout })
               {/* Close button on mobile */}
               <button
                 type="button"
-                className="cart-clear-btn"
-                style={{ display: isMobileCartOpen ? 'flex' : 'none' }}
+                className="cart-close-mobile-btn"
                 onClick={() => setIsMobileCartOpen(false)}
+                title="Tutup Keranjang"
+                aria-label="Tutup Keranjang"
               >
-                <X size={18} />
+                <X size={16} />
+                <span>Tutup</span>
               </button>
             </div>
           </div>
@@ -213,13 +215,44 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ onProceedToCheckout })
             variant="primary"
             size="lg"
             disabled={items.length === 0}
-            onClick={onProceedToCheckout}
+            onClick={() => {
+              setIsMobileCartOpen(false);
+              onProceedToCheckout();
+            }}
             icon={<ArrowRight size={18} />}
           >
             Bayar ({totalItems} item)
           </Button>
         </div>
       </aside>
+
+      {/* Floating Bottom Cart Bar (Khusus Layar HP Standar) */}
+      {totalItems > 0 && !isMobileCartOpen && (
+        <div 
+          className="mobile-cart-floating-bar"
+          onClick={() => setIsMobileCartOpen(true)}
+          role="button"
+          tabIndex={0}
+          id="btn-mobile-cart-floating"
+          title="Buka Pesanan Kasir"
+        >
+          <div className="mobile-cart-floating-left">
+            <div className="mobile-cart-floating-icon">
+              <ShoppingBag size={18} />
+              <span className="mobile-cart-floating-count">{totalItems}</span>
+            </div>
+            <div className="mobile-cart-floating-price-wrap">
+              <span className="mobile-cart-floating-label">{orderType === 'DINE_IN' ? 'Dine-In' : 'Takeaway'}</span>
+              <span className="mobile-cart-floating-total">{formatRupiah(subtotal)}</span>
+            </div>
+          </div>
+
+          <div className="mobile-cart-floating-cta">
+            <span>Lihat Pesanan</span>
+            <ArrowRight size={16} />
+          </div>
+        </div>
+      )}
     </>
   );
 };

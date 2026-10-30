@@ -321,22 +321,52 @@
   color: var(--accent-hover);
 }
 
+.cart-close-mobile-btn {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.cart-close-mobile-btn:hover {
+  background-color: var(--bg-surface-hover);
+  border-color: var(--border-strong);
+}
+
 /* Mobile Drawer & Floating Bar */
-.mobile-cart-trigger {
+.mobile-cart-floating-bar {
   display: none;
 }
 
 @media (max-width: 900px) {
+  .cart-close-mobile-btn {
+    display: inline-flex;
+  }
+
   .cart-sidebar {
     position: fixed;
     right: 0;
     top: 0;
     bottom: 0;
     width: 100%;
-    max-width: 420px;
+    max-width: 440px;
+    height: 100vh;
+    height: 100dvh;
+    z-index: 100;
+    background-color: var(--bg-surface);
     transform: translateX(100%);
-    transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.8);
+    transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.85);
+    display: flex;
+    flex-direction: column;
   }
 
   .cart-sidebar--mobile-open {
@@ -346,25 +376,126 @@
   .mobile-cart-overlay {
     position: fixed;
     inset: 0;
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(2px);
-    z-index: 19;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 99;
   }
 
   /* Floating bar on mobile bottom */
-  .mobile-cart-trigger {
+  .mobile-cart-floating-bar {
     display: flex;
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 64px;
-    background-color: var(--bg-surface);
-    border-top: 1px solid var(--border-subtle);
-    padding: var(--space-2) var(--space-4);
+    bottom: var(--space-3);
+    left: var(--space-3);
+    right: var(--space-3);
+    height: 60px;
+    background: linear-gradient(135deg, #1e222d, #171a21);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    padding: 0 var(--space-4);
     align-items: center;
     justify-content: space-between;
-    z-index: 15;
-    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.5);
+    z-index: 50;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(224, 138, 60, 0.25);
+    cursor: pointer;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    animation: slideUpFloat 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .mobile-cart-floating-bar:active {
+    transform: scale(0.98);
+  }
+
+  .mobile-cart-floating-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .mobile-cart-floating-icon {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-active));
+    color: var(--text-inverse);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(224, 138, 60, 0.4);
+    flex-shrink: 0;
+  }
+
+  .mobile-cart-floating-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: var(--status-danger);
+    color: #fff;
+    font-size: 10px;
+    font-weight: var(--weight-extrabold);
+    font-family: var(--font-mono);
+    min-width: 18px;
+    height: 18px;
+    border-radius: var(--radius-pill);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    border: 2px solid var(--bg-surface);
+  }
+
+  .mobile-cart-floating-price-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .mobile-cart-floating-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-weight: var(--weight-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .mobile-cart-floating-total {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    color: var(--text-primary);
+  }
+
+  .mobile-cart-floating-cta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background-color: var(--accent-primary);
+    color: var(--text-inverse);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+    border-radius: var(--radius-md);
+    box-shadow: 0 2px 8px rgba(224, 138, 60, 0.35);
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 600px) {
+  .cart-sidebar {
+    width: 100%;
+    max-width: 100%;
+    border-left: none;
+  }
+}
+
+@keyframes slideUpFloat {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

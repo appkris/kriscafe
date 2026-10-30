@@ -62,41 +62,6 @@
   gap: 4px;
 }
 
-.pos-brand-shift-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: transparent;
-  border: 1px solid transparent;
-  padding: 3px 8px;
-  border-radius: var(--radius-sm);
-  font-size: var(--text-xs);
-  cursor: pointer;
-  margin-top: 2px;
-  transition: all var(--transition-fast);
-}
-
-.pos-brand-shift-btn--active {
-  color: var(--status-success);
-  background-color: rgba(16, 185, 129, 0.1);
-  border-color: rgba(16, 185, 129, 0.25);
-}
-
-.pos-brand-shift-btn--active:hover {
-  background-color: rgba(16, 185, 129, 0.2);
-}
-
-.pos-brand-shift-btn--warning {
-  color: var(--accent-hover);
-  background-color: rgba(224, 138, 60, 0.12);
-  border-color: rgba(224, 138, 60, 0.35);
-  font-weight: var(--weight-medium);
-}
-
-.pos-brand-shift-btn--warning:hover {
-  background-color: rgba(224, 138, 60, 0.22);
-}
-
 .status-dot {
   width: 7px;
   height: 7px;
@@ -108,61 +73,6 @@
 .status-dot--active {
   background-color: var(--status-success);
   box-shadow: 0 0 6px var(--status-success);
-}
-
-.status-dot--warning {
-  background-color: var(--accent-hover);
-  box-shadow: 0 0 6px var(--accent-hover);
-  animation: pulse-dot 2s infinite ease-in-out;
-}
-
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.85); }
-}
-
-/* Banner Pengingat Buka Shift Kasir */
-.pos-shift-reminder-banner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  padding: 8px var(--space-5);
-  background-color: rgba(224, 138, 60, 0.1);
-  border-bottom: 1px solid rgba(224, 138, 60, 0.25);
-  flex-shrink: 0;
-}
-
-.pos-shift-reminder-info {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--text-xs);
-  color: var(--text-secondary);
-}
-
-.pos-shift-reminder-info strong {
-  color: var(--accent-hover);
-}
-
-.pos-shift-reminder-action {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
-  background-color: var(--accent-primary);
-  color: var(--text-inverse);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-semibold);
-  border: none;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: background-color var(--transition-fast);
-  white-space: nowrap;
-}
-
-.pos-shift-reminder-action:hover {
-  background-color: var(--accent-hover);
 }
 
 /* Category Filter Bar & Inline Search Form */
@@ -213,7 +123,12 @@
   flex: 1;
   overflow-y: auto;
   padding: var(--space-4) var(--space-5);
-  padding-bottom: 80px; /* Space for mobile floating bar if screen small */
+  padding-bottom: 80px;
+}
+
+/* Mobile Cart Button in Header */
+.pos-mobile-cart-btn {
+  display: none;
 }
 
 @media (max-width: 900px) {
@@ -223,6 +138,7 @@
   .pos-topbar {
     padding: var(--space-3);
     flex-wrap: wrap;
+    gap: var(--space-2);
   }
   .pos-brand {
     min-width: auto;
@@ -237,6 +153,52 @@
   }
   .pos-menu-scroll-area {
     padding: var(--space-3);
+    padding-bottom: 96px; /* Ruang agar tidak tertutup floating cart bar */
+  }
+  .pos-mobile-cart-btn {
+    position: relative;
+    height: 34px;
+    padding: 0 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background-color: rgba(224, 138, 60, 0.15);
+    border: 1px solid rgba(224, 138, 60, 0.35);
+    border-radius: var(--radius-md);
+    color: var(--accent-hover);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+  .pos-mobile-cart-btn:hover {
+    background-color: rgba(224, 138, 60, 0.25);
+  }
+  .pos-mobile-cart-badge {
+    min-width: 18px;
+    height: 18px;
+    background-color: var(--accent-primary);
+    color: var(--text-inverse);
+    border-radius: var(--radius-pill);
+    font-size: 11px;
+    font-family: var(--font-mono);
+    font-weight: var(--weight-bold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+  }
+}
+
+@media (max-width: 600px) {
+  .pos-topbar {
+    padding: var(--space-2) var(--space-3);
+  }
+  .pos-brand-logo {
+    width: 34px;
+    height: 34px;
+  }
+  .pos-brand-name {
+    font-size: var(--text-sm);
   }
 }
 
