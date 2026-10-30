@@ -150,13 +150,14 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ onProceedToCheckout })
                 <div className="cart-item-info">
                   <div>
                     <div className="cart-item-name">{item.name}</div>
+                    <div className="cart-item-unit-price">{formatRupiah(item.price)}</div>
                     {item.notes && (
                       <div className="cart-item-notes">{item.notes}</div>
                     )}
                   </div>
                   <button
                     type="button"
-                    style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '2px' }}
+                    className="cart-item-remove-btn"
                     onClick={() => removeItem(item.id)}
                     title="Hapus menu ini"
                   >
@@ -164,27 +165,31 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ onProceedToCheckout })
                   </button>
                 </div>
 
-                <div className="cart-item-pricing">
+                <div className="cart-item-controls">
                   <span className="cart-item-subtotal">
                     {formatRupiah(item.price * item.quantity)}
                   </span>
 
                   {/* Quantity Stepper */}
-                  <div className="qty-stepper">
+                  <div className="qty-counter">
                     <button
                       type="button"
                       className="qty-btn"
                       onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      title="Kurangi pesanan"
+                      aria-label="Kurangi pesanan"
                     >
-                      <Minus size={12} />
+                      <Minus size={13} />
                     </button>
-                    <span className="qty-val">{item.quantity}</span>
+                    <span className="qty-number">{item.quantity}</span>
                     <button
                       type="button"
                       className="qty-btn"
                       onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      title="Tambah pesanan"
+                      aria-label="Tambah pesanan"
                     >
-                      <Plus size={12} />
+                      <Plus size={13} />
                     </button>
                   </div>
                 </div>
@@ -196,12 +201,12 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ onProceedToCheckout })
         {/* Cart Footer / Checkout Trigger */}
         <div className="cart-footer">
           <div className="cart-summary-line">
-            <span>Subtotal</span>
-            <span style={{ fontFamily: 'var(--font-mono)' }}>{formatRupiah(subtotal)}</span>
+            <span className="cart-summary-label">Subtotal</span>
+            <span className="cart-summary-val">{formatRupiah(subtotal)}</span>
           </div>
           <div className="cart-summary-line cart-summary-line--total">
-            <span>Total Tagihan</span>
-            <span style={{ color: 'var(--accent-hover)' }}>{formatRupiah(subtotal)}</span>
+            <span className="cart-summary-label">Total Tagihan</span>
+            <span className="cart-summary-val total-amount">{formatRupiah(subtotal)}</span>
           </div>
 
           <Button
