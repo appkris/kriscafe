@@ -386,74 +386,171 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
             </div>
           </>
         ) : (
-          /* STEP 2: TRANSAKSI BERHASIL & STRUK */
+          /* STEP 2: TRANSAKSI BERHASIL & CETAK STRUK (REDESAIN PREMIUM) */
           <>
-            <div className="payment-modal-body">
-              <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2)' }}>
-                <CheckCircle2 size={44} color="var(--status-success)" />
-                <div style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--weight-bold)', color: 'var(--text-primary)' }}>
-                  Transaksi Berhasil Disimpan!
+            <div className="payment-modal-body success-modal-body">
+              {/* Hero Banner: Status & Icon Animasi */}
+              <div className="success-hero">
+                <div className="success-hero-icon-ring">
+                  <CheckCircle2 size={36} />
                 </div>
-                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
-                  Invoice: <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--accent-hover)' }}>{completedData.transaction.invoice_number}</span>
+                <div className="success-hero-title">Pembayaran Berhasil!</div>
+                <div className="success-hero-meta">
+                  <span className="success-invoice-badge">
+                    {completedData.transaction.invoice_number}
+                  </span>
+                  <span className="success-dot-separator">•</span>
+                  <span className="success-type-badge">
+                    {completedData.transaction.order_type === 'DINE_IN' 
+                      ? (completedData.transaction.table_number 
+                          ? `Dine-In • ${completedData.transaction.table_number.toLowerCase().startsWith('meja') ? completedData.transaction.table_number : `Meja ${completedData.transaction.table_number}`}` 
+                          : 'Dine-In')
+                      : 'Takeaway'}
+                  </span>
+                  {completedData.transaction.customer_name && (
+                    <>
+                      <span className="success-dot-separator">•</span>
+                      <span className="success-type-badge">
+                        An. {completedData.transaction.customer_name}
+                      </span>
+                    </>
+                  )}
+                  <span className="success-dot-separator">•</span>
+                  <span className="success-method-badge">
+                    {completedData.transaction.payment_method === 'CASH' ? 'Tunai' : 'QRIS'}
+                  </span>
                 </div>
               </div>
 
-              {/* Rangkuman Pembayaran */}
-              <div className="change-box change-box--success">
-                <span>Uang Kembalian:</span>
-                <span style={{ fontSize: 'var(--text-2xl)', fontWeight: 800 }}>
-                  {receiptService.formatRupiah(completedData.transaction.change_due)}
-                </span>
+              {/* Highlight Kembalian (CASH) atau Status (QRIS) */}
+              {completedData.transaction.payment_method === 'CASH' ? (
+                <div className="success-change-card">
+                  <div className="success-change-header">
+                    <span className="success-change-label">UANG KEMBALIAN KASIR</span>
+                    <span className="success-change-badge">
+                      {completedData.transaction.change_due > 0 ? 'Wajib Diberikan' : 'Uang Pas'}
+                    </span>
+                  </div>
+                  <div className="success-change-amount">
+                    {receiptService.formatRupiah(completedData.transaction.change_due)}
+                  </div>
+                  <div className="success-change-breakdown">
+                    <div className="success-breakdown-col">
+                      <span>Total Belanja:</span>
+                      <strong>{receiptService.formatRupiah(completedData.transaction.total)}</strong>
+                    </div>
+                    <div className="success-breakdown-divider" />
+                    <div className="success-breakdown-col">
+                      <span>Uang Diterima:</span>
+                      <strong>{receiptService.formatRupiah(completedData.transaction.amount_paid)}</strong>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="success-change-card success-change-card--qris">
+                  <div className="success-change-header">
+                    <span className="success-change-label">STATUS PEMBAYARAN QRIS</span>
+                    <span className="success-change-badge success-change-badge--qris">Lunas</span>
+                  </div>
+                  <div className="success-change-amount" style={{ color: 'var(--status-info)' }}>
+                    {receiptService.formatRupiah(completedData.transaction.total)}
+                  </div>
+                  <div className="success-change-breakdown">
+                    <div className="success-breakdown-col">
+                      <span>Metode:</span>
+                      <strong>QRIS KrisCafe</strong>
+                    </div>
+                    <div className="success-breakdown-divider" />
+                    <div className="success-breakdown-col">
+                      <span>Kasir:</span>
+                      <strong>{completedData.transaction.cashier_name}</strong>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Rincian Ringkas Item Terjual */}
+              <div className="success-items-preview">
+                <div className="success-items-header">
+                  <span>Rincian Item ({completedData.items.length})</span>
+                  <span>{new Date(completedData.transaction.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</span>
+                </div>
+                <div className="success-items-list">
+                  {completedData.items.map((it) => (
+                    <div key={it.id} className="success-item-row">
+                      <div className="success-item-name-wrap">
+                        <span className="success-item-qty">{it.quantity}x</span>
+                        <span className="success-item-name">{it.menu_name}</span>
+                        {it.notes && <span className="success-item-notes">({it.notes})</span>}
+                      </div>
+                      <span className="success-item-subtotal">
+                        {receiptService.formatRupiah(it.item_subtotal)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              {/* Tombol Cetak Struk Fisik & Digital WhatsApp */}
-              <div className="receipt-step-actions">
-                <Button
-                  variant="primary"
-                  size="md"
-                  icon={<Printer size={18} />}
-                  onClick={handlePrintReceipt}
-                >
-                  Cetak Struk Thermal (58mm)
-                </Button>
-
-                <div className="whatsapp-input-group">
-                  <input
-                    type="tel"
-                    className="whatsapp-input"
-                    placeholder="Nomor WA (contoh: 08123456789)"
-                    value={whatsappPhone}
-                    onChange={(e) => setWhatsappPhone(e.target.value)}
-                  />
+              {/* Tombol Cetak Struk Fisik & WhatsApp */}
+              <div className="success-receipt-actions">
+                <div className="success-action-title">Cetak atau Kirim Struk</div>
+                
+                <div className="success-action-buttons-grid">
                   <Button
-                    variant="secondary"
+                    variant="primary"
                     size="md"
-                    icon={<Send size={16} />}
-                    onClick={handleSendWhatsApp}
+                    className="btn-print-thermal"
+                    icon={<Printer size={18} />}
+                    onClick={handlePrintReceipt}
                   >
-                    Kirim WA
+                    Cetak Struk Thermal
                   </Button>
+
+                  <div className="success-whatsapp-box">
+                    <div className="success-wa-input-wrap">
+                      <Send size={15} className="success-wa-icon" />
+                      <input
+                        type="tel"
+                        className="success-whatsapp-input"
+                        placeholder="No. WA (08123456789)"
+                        value={whatsappPhone}
+                        onChange={(e) => setWhatsappPhone(e.target.value)}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      className="btn-send-whatsapp"
+                      onClick={handleSendWhatsApp}
+                      title="Kirim Struk ke WhatsApp Pelanggan"
+                    >
+                      Kirim WA
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="payment-modal-footer">
+            {/* Footer Modal: Tombol Transaksi Baru yang Sangat Jelas & Ergonomis */}
+            <div className="payment-modal-footer success-modal-footer">
               <Button
-                variant="outline"
+                variant="primary"
                 size="lg"
-                icon={<RotateCcw size={16} />}
+                fullWidth
+                id="btn-finish-new-order"
+                icon={<RotateCcw size={18} />}
                 onClick={handleFinishAndReset}
               >
-                Transaksi Baru
+                Selesai & Transaksi Baru
               </Button>
             </div>
 
-            {/* Template Struk Thermal 58mm (Tersembunyi di Layar, Aktif saat Print) */}
-            <ThermalReceipt58
-              transaction={completedData.transaction}
-              items={completedData.items}
-            />
+            {/* Template Struk Thermal 58mm (Khusus Cetak, Tersembunyi di Layar) */}
+            <div className="print-only-container">
+              <ThermalReceipt58
+                transaction={completedData.transaction}
+                items={completedData.items}
+              />
+            </div>
           </>
         )}
       </div>
