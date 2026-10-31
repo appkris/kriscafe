@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Coins, 
-  QrCode, 
-  Printer, 
-  Send, 
-  CheckCircle2, 
-  RotateCcw, 
+import {
+  Coins,
+  QrCode,
+  Printer,
+  Send,
+  CheckCircle2,
+  RotateCcw,
   X
 } from 'lucide-react';
 import { useCartStore } from '../../store/cartStore';
@@ -23,11 +23,11 @@ interface PaymentModalProps {
 }
 
 export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) => {
-  const { 
-    items, 
-    orderType, 
-    getSubtotal, 
-    clearCart 
+  const {
+    items,
+    orderType,
+    getSubtotal,
+    clearCart
   } = useCartStore();
 
   const activeShift = useLiveQuery(() => shiftRepository.getCurrentOpenShift(), []);
@@ -41,7 +41,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
   // Input Opsional No Meja & Nama Pemesan
   const [tableNumberInput, setTableNumberInput] = useState<string>('');
   const [customerNameInput, setCustomerNameInput] = useState<string>('');
-  
+
   // Step 2: Transaksi Berhasil & Data Struk
   const [completedData, setCompletedData] = useState<{
     transaction: Transaction;
@@ -49,7 +49,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
   } | null>(null);
 
   const [whatsappPhone, setWhatsappPhone] = useState<string>('');
-  
+
   // Ref untuk mengunci eksekusi pembayaran agar tidak terjadi double submit / double invoice
   const isSubmittingRef = useRef<boolean>(false);
 
@@ -160,8 +160,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
           <div style={{ fontWeight: 'var(--weight-bold)', fontSize: 'var(--text-base)', color: 'var(--text-primary)' }}>
             {completedData ? 'Transaksi Selesai' : 'Pembayaran Pesanan'}
           </div>
-          <button 
-            type="button" 
+          <button
+            type="button"
             style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
             onClick={completedData ? handleFinishAndReset : onClose}
           >
@@ -318,8 +318,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
                       {isCashSufficient ? 'Uang Kembalian:' : 'Uang Kurang:'}
                     </span>
                     <span style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold' }}>
-                      {isCashSufficient 
-                        ? receiptService.formatRupiah(changeDue) 
+                      {isCashSufficient
+                        ? receiptService.formatRupiah(changeDue)
                         : receiptService.formatRupiah(total - cashGiven)}
                     </span>
                   </div>
@@ -401,10 +401,10 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
                   </span>
                   <span className="success-dot-separator">•</span>
                   <span className="success-type-badge">
-                    {completedData.transaction.order_type === 'DINE_IN' 
-                      ? (completedData.transaction.table_number 
-                          ? `Dine-In • ${completedData.transaction.table_number.toLowerCase().startsWith('meja') ? completedData.transaction.table_number : `Meja ${completedData.transaction.table_number}`}` 
-                          : 'Dine-In')
+                    {completedData.transaction.order_type === 'DINE_IN'
+                      ? (completedData.transaction.table_number
+                        ? `Dine-In • ${completedData.transaction.table_number.toLowerCase().startsWith('meja') ? completedData.transaction.table_number : `Meja ${completedData.transaction.table_number}`}`
+                        : 'Dine-In')
                       : 'Takeaway'}
                   </span>
                   {completedData.transaction.customer_name && (
@@ -494,7 +494,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
               {/* Tombol Cetak Struk Fisik & WhatsApp */}
               <div className="success-receipt-actions">
                 <div className="success-action-title">Cetak atau Kirim Struk</div>
-                
+
                 <div className="success-action-buttons-grid">
                   <Button
                     variant="primary"
@@ -503,7 +503,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
                     icon={<Printer size={18} />}
                     onClick={handlePrintReceipt}
                   >
-                    Cetak Struk Thermal
+                    Cetak Struk
                   </Button>
 
                   <div className="success-whatsapp-box">
@@ -512,7 +512,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
                       <input
                         type="tel"
                         className="success-whatsapp-input"
-                        placeholder="No. WA (08123456789)"
+                        placeholder="(0812345678)"
                         value={whatsappPhone}
                         onChange={(e) => setWhatsappPhone(e.target.value)}
                       />
@@ -523,7 +523,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
                       onClick={handleSendWhatsApp}
                       title="Kirim Struk ke WhatsApp Pelanggan"
                     >
-                      Kirim WA
+                      Kirim
                     </button>
                   </div>
                 </div>

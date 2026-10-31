@@ -1,9 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { 
-  Coffee, 
-  ShoppingBag, 
-  TrendingUp, 
+import {
+  Coffee,
+  ShoppingBag,
+  TrendingUp,
   SlidersHorizontal,
   Sliders,
   Lock,
@@ -107,7 +107,7 @@ export const PosPage: React.FC = () => {
               <div className="pos-brand-name">KrisCafe POS</div>
               <div className="pos-brand-status">
                 <span className="status-dot status-dot--active" />
-                <span>{isAdmin ? 'Mode Administrator' : 'Kasir Siap'}</span>
+                <span>{isAdmin ? 'Administrator' : 'Kasir'}</span>
               </div>
             </div>
           </div>
@@ -278,7 +278,7 @@ export const PosPage: React.FC = () => {
         subtitle="Masukkan PIN untuk membuka kembali layar kasir"
         requiredRole="ANY"
         hintText={isAdmin ? 'Admin: 8888' : 'Kasir: 1234'}
-        onSuccess={() => {}}
+        onSuccess={() => { }}
       />
     </div>
   );
